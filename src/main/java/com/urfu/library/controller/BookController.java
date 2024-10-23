@@ -11,6 +11,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Контроллер для управления операциями с книгами.
+ * Обрабатывает HTTP-запросы, связанные с книгами.
+ */
 @RestController
 @RequestMapping("/api/book")
 public class BookController {
@@ -21,6 +25,12 @@ public class BookController {
         this.bookService = bookService;
     }
 
+    /**
+     * Получает список всех книг.
+     * @return ResponseEntity с списком книг и статусом HTTP.
+     * HttpStatus: OK, в случае успеха.
+     * HttpStatus: NO_CONTENT, в случае отсутствия книг в БД.
+     */
     @GetMapping("/all")
     public ResponseEntity<List<Book>> getAllBooks() {
         List<Book> books = bookService.getAllBooks();
@@ -29,6 +39,16 @@ public class BookController {
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
+    /**
+     * Обновляет информацию о книге по заданному идентификатору книги.
+     *
+     * @param bookId   уникальный идентификатор книги
+     * @param newBook  новый объект книги с обновленной информацией
+     * @return ResponseEntity с соответствующим статусом HTTP
+     * HttpStatus: OK, в случае успеха.
+     * HttpStatus: NO_CONTENT, в случае отсутствия искомой книги в БД.
+     * HttpStatus: UNPROCESSABLE_ENTITY, в случае некорректности входных данных для книги.
+     */
     @PutMapping("/{bookId}")
     public ResponseEntity<Object> updateBookInfo(@PathVariable("bookId") UUID bookId, @RequestBody Book newBook) {
         if (newBook.getTitle() == null || newBook.getAuthor() == null || newBook.getDescription() == null)
@@ -40,6 +60,14 @@ public class BookController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    /**
+     * Удаляет книгу по заданному идентификатору книги.
+     *
+     * @param bookId уникальный идентификатор книги
+     * @return ResponseEntity с соответствующим статусом HTTP
+     * HttpStatus: OK, в случае успеха.
+     * HttpStatus: NO_CONTENT, в случае отсутствия искомой книги в БД.
+     */
     @DeleteMapping("/{bookId}")
     public ResponseEntity<Object> deleteBook(@PathVariable("bookId") UUID bookId) {
         boolean deleted = bookService.deleteBook(bookId);
