@@ -9,6 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,6 +38,43 @@ public class BookServiceTest {
         book.setDescription("Test Description");
     }
 
+    /**
+     * Тест для проверки успешного получения всех книг.
+     * Данный тест симулирует наличие двух книг в БД, и проверяет,
+     * что  метод репозитория findAll() вызывается.
+     */
+    @Test
+    void testGetAllBooks() {
+        List<Book> books = Arrays.asList(book, book);
+        when(bookRepo.findAll()).thenReturn(books);
+
+        List<Book> result = bookService.getAllBooks();
+
+        assertFalse(result.isEmpty());
+        assertEquals(2, result.size());
+        verify(bookRepo, times(1)).findAll();
+    }
+
+    /**
+     * Данный тест симулирует отсутствие книг в БД, и проверяет,
+     * что  метод репозитория findAll() вызывается.
+     */
+    @Test
+    void testGetAllBooks_NoBooks() {
+        when(bookRepo.findAll()).thenReturn(List.of());
+
+        List<Book> result = bookService.getAllBooks();
+
+        assertTrue(result.isEmpty());
+        assertEquals(0, result.size());
+        verify(bookRepo, times(1)).findAll();
+    }
+
+    /**
+     * Тест для проверки успешного обновления информации о книге.
+     * Данный тест симулирует наличие книги в БД, и проверяет, что информация
+     * о книге успешно обновляется, а метод репозитория save() вызывается.
+     */
     @Test
     public void testUpdateBookInfo_Success() {
         Book newBookData = new Book();
@@ -51,6 +90,12 @@ public class BookServiceTest {
         verify(bookRepo, times(1)).save(any(Book.class));
     }
 
+    /**
+     * Тест для проверки ситуации, когда обновление книги невозможно,
+     * так как книга с указанным ID не найдена.
+     * Тест проверяет, что метод репозитория save() не вызывается,
+     * а возвращаемое значение пустое.
+     */
     @Test
     public void testUpdateBookInfo_BookNotFound() {
         when(bookRepo.findById(bookId)).thenReturn(Optional.empty());
@@ -60,6 +105,11 @@ public class BookServiceTest {
         verify(bookRepo, never()).save(any(Book.class));
     }
 
+    /**
+     * Тест для проверки успешного удаления книги из БД.
+     * Тест симулирует наличие книги в БД и проверяет, что
+     * книга успешно удаляется, а метод репозитория deleteById() вызывается.
+     */
     @Test
     public void testDeleteBook_Success() {
         when(bookRepo.findById(bookId)).thenReturn(Optional.of(book));
@@ -69,6 +119,11 @@ public class BookServiceTest {
         verify(bookRepo, times(1)).deleteById(bookId);
     }
 
+    /**
+     * Тест для проверки ситуации, когда удаление книги невозможно,
+     * так как книга с указанным ID не найдена в БД.
+     * Тест проверяет, что метод репозитория deleteById() не вызывается.
+     */
     @Test
     public void testDeleteBook_BookNotFound() {
         when(bookRepo.findById(bookId)).thenReturn(Optional.empty());
