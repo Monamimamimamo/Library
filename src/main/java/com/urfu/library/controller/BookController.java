@@ -2,6 +2,7 @@ package com.urfu.library.controller;
 
 import com.urfu.library.model.Book;
 import com.urfu.library.service.BookService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +20,8 @@ import java.util.UUID;
 @RequestMapping("/api/book")
 public class BookController {
 
-    private final BookService bookService;
-
-    public BookController(BookService bookService) {
-        this.bookService = bookService;
-    }
+    @Autowired
+    private BookService bookService;
 
     /**
      * Получает список всех книг.
@@ -66,7 +64,7 @@ public class BookController {
      * @param bookId уникальный идентификатор книги
      * @return ResponseEntity с соответствующим статусом HTTP
      * HttpStatus: OK, в случае успеха.
-     * HttpStatus: NO_CONTENT, в случае отсутствия искомой книги в БД.
+     * HttpStatus: NO_CONTENT, в случае отсутствия искомой книги в БД.Ъ
      */
     @DeleteMapping("/{bookId}")
     public ResponseEntity<Object> deleteBook(@PathVariable("bookId") UUID bookId) {

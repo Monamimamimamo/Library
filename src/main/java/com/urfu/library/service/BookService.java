@@ -2,6 +2,7 @@ package com.urfu.library.service;
 
 import com.urfu.library.model.Book;
 import com.urfu.library.model.BookRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,11 +16,8 @@ import java.util.UUID;
 @Service
 public class BookService {
 
-    private final BookRepo bookRepo;
-
-    public BookService(BookRepo bookRepo) {
-        this.bookRepo = bookRepo;
-    }
+    @Autowired
+    private  BookRepo bookRepo;
 
     /**
      * Получить список всех книг в библиотеке.
