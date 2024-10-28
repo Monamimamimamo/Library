@@ -2,7 +2,6 @@ package com.urfu.library.service;
 
 import com.urfu.library.model.Book;
 import com.urfu.library.model.BookRepo;
-import com.urfu.library.service.BookService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -41,7 +40,7 @@ public class BookServiceTest {
     /**
      * Тест для проверки успешного получения всех книг.
      * Данный тест симулирует наличие двух книг в БД, и проверяет,
-     * что  метод репозитория findAll() вызывается.
+     * что метод репозитория findAll() вызывается.
      */
     @Test
     void testGetAllBooks() {
@@ -57,7 +56,7 @@ public class BookServiceTest {
 
     /**
      * Данный тест симулирует отсутствие книг в БД, и проверяет,
-     * что  метод репозитория findAll() вызывается.
+     * что метод репозитория findAll() вызывается.
      */
     @Test
     void testGetAllBooks_NoBooks() {
@@ -131,5 +130,45 @@ public class BookServiceTest {
 
         assertFalse(result);
         verify(bookRepo, never()).deleteById(any(UUID.class));
+    }
+
+    /**
+     * Тестирует добавление новой книги
+     */
+    @Test
+    public void testCreateBook_Success() {
+        when(bookRepo.findById(bookId)).thenReturn(Optional.of(book));
+        bookService.saveBook(book);
+
+        Optional<Book> savedBook = bookRepo.findById(bookId);
+        assertTrue(savedBook.isPresent());
+        assertEquals(book, savedBook.get());
+        verify(bookRepo, times(1)).save(book);
+    }
+
+    /**
+     * Тестирует получение книги по Id
+     */
+    @Test
+    public void testGetBookById_Success() {
+        when(bookRepo.findById(bookId)).thenReturn(Optional.of(book));
+
+        Optional<Book> foundBook = bookService.getBookById(bookId);
+
+        assertTrue(foundBook.isPresent());
+        assertEquals(book, foundBook.get());
+        verify(bookRepo, times(1)).findById(bookId);
+    }
+
+    /**
+     * Тестирует поиск книги по названию
+     */
+    @Test
+    public void testFindBookByTitle_Success() {
+        when(bookRepo.findByTitle(book.getTitle())).thenReturn(Arrays.asList(book));
+        List<Book> foundBook = bookService.getBooksByTitle(book.getTitle());
+        assertFalse(foundBook.isEmpty());
+        assertEquals(foundBook.getFirst(), book);
+        verify(bookRepo, times(1)).findByTitle(book.getTitle());
     }
 }

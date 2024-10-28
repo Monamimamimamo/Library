@@ -1,21 +1,16 @@
 package com.urfu.library.controller;
 
+import com.urfu.library.controller.advice.BookControllerAdvice;
 import com.urfu.library.model.Book;
 import com.urfu.library.service.BookService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -34,12 +29,10 @@ public class BookControllerTest {
     private UUID bookId;
     private Book book;
 
-
-
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(bookController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(bookController).setControllerAdvice(BookControllerAdvice.class).build();
 
         bookId = UUID.randomUUID();
         book = new Book();
@@ -148,5 +141,83 @@ public class BookControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(bookService, times(1)).deleteBook(bookId);
+    }
+
+    /**
+     * Тестирует успешное добавление новой книги.
+     * Ожидает возвращение статуса 200 OK
+     */
+    @Test
+    public void testSaveBook_Success() throws Exception {
+        mockMvc.perform(post("/api/book").contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"title\": \"Test Title\", \"author\": \"Test Author\", \"description\": \"Test Description\" }"));
+
+        verify(bookService, times(1)).saveBook(any(Book.class));
+    }
+
+    /**
+     * Тестирует валидацию при добавлении книги.
+     * В случае нулевого значения хотя бы одного из полей отдает 422 Unprocessable Entity
+     */
+    @Test
+    public void testSaveBook_UnprocessableEntity() throws Exception {
+        mockMvc.perform(post("/api/book").contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"title\": null, \"author\": \"Test Author\", \"description\": \"Test Description\" }")).andExpect(status().isUnprocessableEntity());
+
+
+        verify(bookService, never()).saveBook(any(Book.class));
+    }
+
+    /**
+     * Тестирует получение книги по Id.
+     * Ожидает возвращение статуса 200 Ok
+     */
+    @Test
+    public void testGetBook_Success() throws Exception {
+        when(bookService.getBookById(bookId)).thenReturn(Optional.of(book));
+        mockMvc.perform(get("/api/book/{bookId}", bookId))
+                .andExpect(status().isOk());
+
+        verify(bookService, times(1)).getBookById(bookId);
+    }
+
+    /**
+     * Тестирует получение несуществующей книги по Id.
+     * Ожидает возвращение статуса 404 Not Found
+     */
+    @Test
+    public void testGetBook_NotFound() throws Exception {
+        when(bookService.getBookById(bookId)).thenReturn(Optional.empty());
+        mockMvc.perform(get("/api/book/{bookId}", bookId))
+                .andExpect(status().isNotFound());
+
+        verify(bookService, times(1)).getBookById(bookId);
+    }
+
+    /**
+     * Тестирует поиск книги по названию.
+     * Ожидает статус 200 Ok
+     */
+    @Test
+    public void testGetBooksByTitle_Success() throws Exception {
+        when(bookService.getBooksByTitle(book.getTitle())).thenReturn(List.of(book));
+        mockMvc.perform(get("/api/book?title={title}", book.getTitle()))
+                .andExpect(status().isOk());
+
+        verify(bookService, times(1)).getBooksByTitle(book.getTitle());
+    }
+
+    /**
+     * Тестирует поиск по названию несуществующей книги.
+     * Ожидает возвращение статуса 404 Not Found
+     */
+    @Test
+    public void testGetBooksByTitle_NotFound() throws Exception {
+        when(bookService.getBooksByTitle(book.getTitle())).thenThrow(NoSuchElementException.class);
+
+        mockMvc.perform(get("/api/book?title={title}", book.getTitle()))
+                .andExpect(status().isNotFound());
+
+        verify(bookService, times(1)).getBooksByTitle(book.getTitle());
     }
 }
