@@ -2,16 +2,14 @@ package com.urfu.library.service;
 
 import com.urfu.library.model.Book;
 import com.urfu.library.model.BookRepo;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -138,11 +136,28 @@ public class BookServiceTest {
     @Test
     public void testCreateBook_Success() {
         when(bookRepo.findById(bookId)).thenReturn(Optional.of(book));
-        bookService.saveBook(book);
 
+        bookService.saveBook(book);
         Optional<Book> savedBook = bookRepo.findById(bookId);
         assertTrue(savedBook.isPresent());
         assertEquals(book, savedBook.get());
+        verify(bookRepo, times(1)).save(book);
+    }
+
+    /**
+     * Проверка на создание некорректного экземпляра книги,
+     * в бд ничего сохранено не будет
+     */
+    @Test
+    public void testCreateBook_UnprocessableEntity() {
+        when(bookRepo.findById(bookId)).thenReturn(Optional.of(book));
+        Book unprocessableBook = new Book();
+        unprocessableBook.setTitle("");
+        unprocessableBook.setAuthor("Author");
+        unprocessableBook.setDescription("Description");
+        bookService.saveBook(book);
+        Optional<Book> savedBook = bookRepo.findById(unprocessableBook.getId());
+        assertTrue(savedBook.isEmpty());
         verify(bookRepo, times(1)).save(book);
     }
 
@@ -161,14 +176,36 @@ public class BookServiceTest {
     }
 
     /**
+     * Проверка на возвращение Optional.empty() в случае отсутствия книги в бд
+     */
+    @Test
+    public void testGetBookById_BookNotFound() {
+        when(bookRepo.findById(bookId)).thenReturn(Optional.empty());
+        Optional<Book> foundBook = bookService.getBookById(bookId);
+
+        assertTrue(foundBook.isEmpty());
+    }
+
+    /**
      * Тестирует поиск книги по названию
      */
     @Test
     public void testFindBookByTitle_Success() {
-        when(bookRepo.findByTitle(book.getTitle())).thenReturn(Arrays.asList(book));
+        when(bookRepo.findByTitle(book.getTitle())).thenReturn(List.of(book));
         List<Book> foundBook = bookService.getBooksByTitle(book.getTitle());
         assertFalse(foundBook.isEmpty());
         assertEquals(foundBook.getFirst(), book);
         verify(bookRepo, times(1)).findByTitle(book.getTitle());
+    }
+
+    /**
+     * Тестирует выбрасывание ошибки NoSuchElementException
+     * в случае отсутствия книги с заданным названием в бд
+     */
+    @Test
+    public void testFindBookByTitle_BookNotFound() {
+        when(bookRepo.findByTitle("NotFoundTitle")).thenReturn(List.of());
+
+        Assertions.assertThrows(NoSuchElementException.class, () -> bookService.getBooksByTitle("NotFoundTitle"));
     }
 }

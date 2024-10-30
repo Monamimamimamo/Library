@@ -150,7 +150,8 @@ public class BookControllerTest {
     @Test
     public void testSaveBook_Success() throws Exception {
         mockMvc.perform(post("/api/book").contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"title\": \"Test Title\", \"author\": \"Test Author\", \"description\": \"Test Description\" }"));
+                .content("{ \"title\": \"Test Title\", \"author\": \"Test Author\", \"description\": \"Test Description\" }"))
+                .andExpect(status().isCreated());
 
         verify(bookService, times(1)).saveBook(any(Book.class));
     }
@@ -162,21 +163,24 @@ public class BookControllerTest {
     @Test
     public void testSaveBook_UnprocessableEntity() throws Exception {
         mockMvc.perform(post("/api/book").contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"title\": null, \"author\": \"Test Author\", \"description\": \"Test Description\" }")).andExpect(status().isUnprocessableEntity());
-
+                .content("{ \"title\": null, \"author\": \"Test Author\", \"description\": \"Test Description\" }"))
+                .andExpect(status().isUnprocessableEntity());
 
         verify(bookService, never()).saveBook(any(Book.class));
     }
 
     /**
      * Тестирует получение книги по Id.
-     * Ожидает возвращение статуса 200 Ok
+     * Ожидает возвращение статуса 200 Ok и соответствующей книги
      */
     @Test
     public void testGetBook_Success() throws Exception {
         when(bookService.getBookById(bookId)).thenReturn(Optional.of(book));
         mockMvc.perform(get("/api/book/{bookId}", bookId))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.title").value("Test Title"))
+                .andExpect(jsonPath("$.author").value("Test Author"))
+                .andExpect(jsonPath("$.description").value("Test Description"));
 
         verify(bookService, times(1)).getBookById(bookId);
     }
@@ -196,13 +200,14 @@ public class BookControllerTest {
 
     /**
      * Тестирует поиск книги по названию.
-     * Ожидает статус 200 Ok
+     * Ожидает статус 200 Ok и соответствующую книгу
      */
     @Test
     public void testGetBooksByTitle_Success() throws Exception {
         when(bookService.getBooksByTitle(book.getTitle())).thenReturn(List.of(book));
         mockMvc.perform(get("/api/book?title={title}", book.getTitle()))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$..title").value("Test Title"));
 
         verify(bookService, times(1)).getBooksByTitle(book.getTitle());
     }
@@ -214,7 +219,6 @@ public class BookControllerTest {
     @Test
     public void testGetBooksByTitle_NotFound() throws Exception {
         when(bookService.getBooksByTitle(book.getTitle())).thenThrow(NoSuchElementException.class);
-
         mockMvc.perform(get("/api/book?title={title}", book.getTitle()))
                 .andExpect(status().isNotFound());
 

@@ -21,6 +21,10 @@ public class Book {
     @NotBlank(message = "Description must be not null")
     private String description;
 
+    public UUID getId() {
+        return id;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -31,6 +35,10 @@ public class Book {
 
     public String getAuthor() {
         return author;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public void setAuthor(String author) {
