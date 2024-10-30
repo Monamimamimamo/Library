@@ -16,6 +16,7 @@
 	<properties>
 		<java.version>21</java.version>
 		<hibernate-core.version>6.2.8.Final</hibernate-core.version>
+		<spring.boot.starter.validation>3.3.5</spring.boot.starter.validation>
 	</properties>
 
 	<dependencies>
@@ -45,6 +46,13 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+			<version>${spring.boot.starter.validation}</version>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>

@@ -5,9 +5,7 @@ import com.urfu.library.model.BookRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Сервис для управления книгами в библиотеке.
@@ -16,8 +14,12 @@ import java.util.UUID;
 @Service
 public class BookService {
 
+    private final BookRepo bookRepo;
+
     @Autowired
-    private  BookRepo bookRepo;
+    public BookService(BookRepo bookRepo) {
+        this.bookRepo = bookRepo;
+    }
 
     /**
      * Получить список всех книг в библиотеке.
@@ -60,5 +62,37 @@ public class BookService {
             return false;
         bookRepo.deleteById(bookId);
         return true;
+    }
+
+    /**
+     * Сохраняет книгу в базу данных
+     * @param newBook Книга для сохранения
+     */
+    public void saveBook(Book newBook) {
+        bookRepo.save(newBook);
+    }
+
+    /**
+     * Возвращет книгу по ID
+     * @param bookId ID книги
+     * @return найденную книгу
+     */
+    public Optional<Book> getBookById(UUID bookId) {
+        return bookRepo.findById(bookId);
+    }
+
+    /**
+     * Возвращает список книг по названию
+     * @param title название книги
+     * @return найденные книги
+     * @throws NoSuchElementException если книги по запрашиваемому названию не найдены
+     */
+    public List<Book> getBooksByTitle(String title) {
+        List<Book> books = bookRepo.findByTitle(title);
+        if(books.isEmpty()){
+            throw new NoSuchElementException();
+        } else {
+            return books;
+        }
     }
 }

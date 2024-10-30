@@ -2,13 +2,14 @@ package com.urfu.library.controller;
 
 import com.urfu.library.model.Book;
 import com.urfu.library.service.BookService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,10 +19,15 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("/api/book")
+@Validated
 public class BookController {
 
+    private final BookService bookService;
+
     @Autowired
-    private BookService bookService;
+    public BookController(BookService bookService) {
+        this.bookService = bookService;
+    }
 
     /**
      * Получает список всех книг.
@@ -72,5 +78,50 @@ public class BookController {
         if (deleted)
             return new ResponseEntity<>(HttpStatus.OK);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     * Создает новую книгу, добавляет ее в каталог
+     * @param book книга для добавления в каталог
+     * @return HTTP status:
+     * <ul>
+     *     <li>201 Created</li>
+     *     <li>422 Unprocessable Entity</li>
+     * </ul>
+     */
+    @PostMapping
+    public ResponseEntity<Object> createBook(@Valid @RequestBody Book book) {
+        bookService.saveBook(book);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    /**
+     * Возвращает книгу по id
+     * @param bookId идентификатор книги
+     * @return HTTP status:
+     * <ul>
+     *     <li>200 Success</li>
+     *     <li>404 Not Found</li>
+     * </ul>
+     */
+    @GetMapping("/{bookId}")
+    public ResponseEntity<Object> getBook(@PathVariable("bookId") UUID bookId) {
+        Optional<Book> book = bookService.getBookById(bookId);
+        return ResponseEntity.ok().body(book.get());
+    }
+
+    /**
+     * Возвращает список книг соответствующих запрашиваемому названию
+     * @param title название книги
+     * @return HTTP status:
+     * <ul>
+     *     <li>200 Success</li>
+     *     <li>404 Not Found</li>
+     * </ul>
+     */
+    @GetMapping
+    public ResponseEntity<Object> getBooksByTitle(@RequestParam String title) {
+        List<Book> books = bookService.getBooksByTitle(title);
+        return ResponseEntity.ok().body(books);
     }
 }
