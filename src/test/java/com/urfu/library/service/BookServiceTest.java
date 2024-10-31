@@ -5,15 +5,9 @@ import com.urfu.library.model.BookRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
 import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 
 /**
  * Класс реализует модульные тесты для сервиса книг
@@ -47,13 +41,13 @@ public class BookServiceTest {
     @Test
     void testGetAllBooks() {
         List<Book> books = Arrays.asList(book, book);
-        when(bookRepository.findAll()).thenReturn(books);
+        Mockito.when(bookRepository.findAll()).thenReturn(books);
 
         List<Book> result = bookService.getAllBooks();
 
-        assertFalse(result.isEmpty());
-        assertEquals(2, result.size());
-        verify(bookRepository, times(1)).findAll();
+        Assertions.assertFalse(result.isEmpty());
+        Assertions.assertEquals(2, result.size());
+        Mockito.verify(bookRepository, Mockito.times(1)).findAll();
     }
 
     /**
@@ -62,13 +56,13 @@ public class BookServiceTest {
      */
     @Test
     void testGetAllBooks_NoBooks() {
-        when(bookRepository.findAll()).thenReturn(List.of());
+        Mockito.when(bookRepository.findAll()).thenReturn(List.of());
 
         List<Book> result = bookService.getAllBooks();
 
-        assertTrue(result.isEmpty());
-        assertEquals(0, result.size());
-        verify(bookRepository, times(1)).findAll();
+        Assertions.assertTrue(result.isEmpty());
+        Assertions.assertEquals(0, result.size());
+        Mockito.verify(bookRepository, Mockito.times(1)).findAll();
     }
 
     /**
@@ -83,12 +77,12 @@ public class BookServiceTest {
         newBookData.setAuthor("Updated Author");
         newBookData.setDescription("Updated Description");
 
-        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+        Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         Optional<Book> updatedBook = bookService.updateBookInfo(bookId, newBookData);
 
-        assertTrue(updatedBook.isPresent());
-        assertEquals("Updated Title", updatedBook.get().getTitle());
-        verify(bookRepository, times(1)).save(any(Book.class));
+        Assertions.assertTrue(updatedBook.isPresent());
+        Assertions.assertEquals("Updated Title", updatedBook.get().getTitle());
+        Mockito.verify(bookRepository, Mockito.times(1)).save(ArgumentMatchers.any(Book.class));
     }
 
     /**
@@ -99,11 +93,11 @@ public class BookServiceTest {
      */
     @Test
     public void testUpdateBookInfo_BookNotFound() {
-        when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
+        Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
         Optional<Book> updatedBook = bookService.updateBookInfo(bookId, book);
 
-        assertTrue(updatedBook.isEmpty());
-        verify(bookRepository, never()).save(any(Book.class));
+        Assertions.assertTrue(updatedBook.isEmpty());
+        Mockito.verify(bookRepository, Mockito.never()).save(ArgumentMatchers.any(Book.class));
     }
 
     /**
@@ -113,11 +107,11 @@ public class BookServiceTest {
      */
     @Test
     public void testDeleteBook_Success() {
-        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+        Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         boolean result = bookService.deleteBook(bookId);
 
-        assertTrue(result);
-        verify(bookRepository, times(1)).deleteById(bookId);
+        Assertions.assertTrue(result);
+        Mockito.verify(bookRepository, Mockito.times(1)).deleteById(bookId);
     }
 
     /**
@@ -127,11 +121,11 @@ public class BookServiceTest {
      */
     @Test
     public void testDeleteBook_BookNotFound() {
-        when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
+        Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
         boolean result = bookService.deleteBook(bookId);
 
-        assertFalse(result);
-        verify(bookRepository, never()).deleteById(any(Integer.class));
+        Assertions.assertFalse(result);
+        Mockito.verify(bookRepository, Mockito.never()).deleteById(ArgumentMatchers.any(Integer.class));
     }
 
     /**
@@ -140,13 +134,13 @@ public class BookServiceTest {
      */
     @Test
     public void testCreateBook_Success() {
-        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+        Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
 
         bookService.saveBook(book);
         Optional<Book> savedBook = bookRepository.findById(bookId);
-        assertTrue(savedBook.isPresent());
-        assertEquals(book, savedBook.get());
-        verify(bookRepository, times(1)).save(book);
+        Assertions.assertTrue(savedBook.isPresent());
+        Assertions.assertEquals(book, savedBook.get());
+        Mockito.verify(bookRepository, Mockito.times(1)).save(book);
     }
 
     /**
@@ -156,15 +150,15 @@ public class BookServiceTest {
      */
     @Test
     public void testCreateBook_UnprocessableEntity() {
-        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+        Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         Book unprocessableBook = new Book();
         unprocessableBook.setTitle("");
         unprocessableBook.setAuthor("Author");
         unprocessableBook.setDescription("Description");
         bookService.saveBook(book);
         Optional<Book> savedBook = bookRepository.findById(unprocessableBook.getId());
-        assertTrue(savedBook.isEmpty());
-        verify(bookRepository, times(1)).save(book);
+        Assertions.assertTrue(savedBook.isEmpty());
+        Mockito.verify(bookRepository, Mockito.times(1)).save(book);
     }
 
     /**
@@ -173,12 +167,12 @@ public class BookServiceTest {
      */
     @Test
     public void testGetBookById_Success() {
-        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+        Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
 
         Book foundBook = bookService.getBookById(bookId);
 
-        assertEquals(book, foundBook);
-        verify(bookRepository, times(1)).findById(bookId);
+        Assertions.assertEquals(book, foundBook);
+        Mockito.verify(bookRepository, Mockito.times(1)).findById(bookId);
     }
 
     /**
@@ -188,7 +182,7 @@ public class BookServiceTest {
      */
     @Test
     public void testGetBookById_BookNotFound() {
-        when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
+        Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(NoSuchElementException.class, () -> bookService.getBookById(2));
     }
@@ -199,11 +193,11 @@ public class BookServiceTest {
      */
     @Test
     public void testFindBookByTitle_Success() {
-        when(bookRepository.findByTitle(book.getTitle())).thenReturn(List.of(book));
+        Mockito.when(bookRepository.findByTitle(book.getTitle())).thenReturn(List.of(book));
         List<Book> foundBook = bookService.getBooksByTitle(book.getTitle());
-        assertFalse(foundBook.isEmpty());
-        assertEquals(foundBook.getFirst(), book);
-        verify(bookRepository, times(1)).findByTitle(book.getTitle());
+        Assertions.assertFalse(foundBook.isEmpty());
+        Assertions.assertEquals(foundBook.getFirst(), book);
+        Mockito.verify(bookRepository, Mockito.times(1)).findByTitle(book.getTitle());
     }
 
     /**
@@ -213,7 +207,7 @@ public class BookServiceTest {
      */
     @Test
     public void testFindBookByTitle_BookNotFound() {
-        when(bookRepository.findByTitle("NotFoundTitle")).thenReturn(List.of());
+        Mockito.when(bookRepository.findByTitle("NotFoundTitle")).thenReturn(List.of());
 
         Assertions.assertThrows(NoSuchElementException.class, () -> bookService.getBooksByTitle("NotFoundTitle"));
     }
