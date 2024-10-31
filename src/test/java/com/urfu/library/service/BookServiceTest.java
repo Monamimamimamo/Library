@@ -1,7 +1,7 @@
 package com.urfu.library.service;
 
 import com.urfu.library.model.Book;
-import com.urfu.library.model.BookRepo;
+import com.urfu.library.model.BookRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,10 +14,14 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+
+/**
+ * Класс реализует модульные тесты для сервиса книг
+ */
 public class BookServiceTest {
 
     @Mock
-    private BookRepo bookRepo;
+    private BookRepository bookRepository;
 
     @InjectMocks
     private BookService bookService;
@@ -43,13 +47,13 @@ public class BookServiceTest {
     @Test
     void testGetAllBooks() {
         List<Book> books = Arrays.asList(book, book);
-        when(bookRepo.findAll()).thenReturn(books);
+        when(bookRepository.findAll()).thenReturn(books);
 
         List<Book> result = bookService.getAllBooks();
 
         assertFalse(result.isEmpty());
         assertEquals(2, result.size());
-        verify(bookRepo, times(1)).findAll();
+        verify(bookRepository, times(1)).findAll();
     }
 
     /**
@@ -58,13 +62,13 @@ public class BookServiceTest {
      */
     @Test
     void testGetAllBooks_NoBooks() {
-        when(bookRepo.findAll()).thenReturn(List.of());
+        when(bookRepository.findAll()).thenReturn(List.of());
 
         List<Book> result = bookService.getAllBooks();
 
         assertTrue(result.isEmpty());
         assertEquals(0, result.size());
-        verify(bookRepo, times(1)).findAll();
+        verify(bookRepository, times(1)).findAll();
     }
 
     /**
@@ -79,12 +83,12 @@ public class BookServiceTest {
         newBookData.setAuthor("Updated Author");
         newBookData.setDescription("Updated Description");
 
-        when(bookRepo.findById(bookId)).thenReturn(Optional.of(book));
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         Optional<Book> updatedBook = bookService.updateBookInfo(bookId, newBookData);
 
         assertTrue(updatedBook.isPresent());
         assertEquals("Updated Title", updatedBook.get().getTitle());
-        verify(bookRepo, times(1)).save(any(Book.class));
+        verify(bookRepository, times(1)).save(any(Book.class));
     }
 
     /**
@@ -95,11 +99,11 @@ public class BookServiceTest {
      */
     @Test
     public void testUpdateBookInfo_BookNotFound() {
-        when(bookRepo.findById(bookId)).thenReturn(Optional.empty());
+        when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
         Optional<Book> updatedBook = bookService.updateBookInfo(bookId, book);
 
         assertTrue(updatedBook.isEmpty());
-        verify(bookRepo, never()).save(any(Book.class));
+        verify(bookRepository, never()).save(any(Book.class));
     }
 
     /**
@@ -109,11 +113,11 @@ public class BookServiceTest {
      */
     @Test
     public void testDeleteBook_Success() {
-        when(bookRepo.findById(bookId)).thenReturn(Optional.of(book));
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         boolean result = bookService.deleteBook(bookId);
 
         assertTrue(result);
-        verify(bookRepo, times(1)).deleteById(bookId);
+        verify(bookRepository, times(1)).deleteById(bookId);
     }
 
     /**
@@ -123,11 +127,11 @@ public class BookServiceTest {
      */
     @Test
     public void testDeleteBook_BookNotFound() {
-        when(bookRepo.findById(bookId)).thenReturn(Optional.empty());
+        when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
         boolean result = bookService.deleteBook(bookId);
 
         assertFalse(result);
-        verify(bookRepo, never()).deleteById(any(UUID.class));
+        verify(bookRepository, never()).deleteById(any(UUID.class));
     }
 
     /**
@@ -135,13 +139,13 @@ public class BookServiceTest {
      */
     @Test
     public void testCreateBook_Success() {
-        when(bookRepo.findById(bookId)).thenReturn(Optional.of(book));
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
 
         bookService.saveBook(book);
-        Optional<Book> savedBook = bookRepo.findById(bookId);
+        Optional<Book> savedBook = bookRepository.findById(bookId);
         assertTrue(savedBook.isPresent());
         assertEquals(book, savedBook.get());
-        verify(bookRepo, times(1)).save(book);
+        verify(bookRepository, times(1)).save(book);
     }
 
     /**
@@ -150,15 +154,15 @@ public class BookServiceTest {
      */
     @Test
     public void testCreateBook_UnprocessableEntity() {
-        when(bookRepo.findById(bookId)).thenReturn(Optional.of(book));
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         Book unprocessableBook = new Book();
         unprocessableBook.setTitle("");
         unprocessableBook.setAuthor("Author");
         unprocessableBook.setDescription("Description");
         bookService.saveBook(book);
-        Optional<Book> savedBook = bookRepo.findById(unprocessableBook.getId());
+        Optional<Book> savedBook = bookRepository.findById(unprocessableBook.getId());
         assertTrue(savedBook.isEmpty());
-        verify(bookRepo, times(1)).save(book);
+        verify(bookRepository, times(1)).save(book);
     }
 
     /**
@@ -166,13 +170,13 @@ public class BookServiceTest {
      */
     @Test
     public void testGetBookById_Success() {
-        when(bookRepo.findById(bookId)).thenReturn(Optional.of(book));
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
 
         Optional<Book> foundBook = bookService.getBookById(bookId);
 
         assertTrue(foundBook.isPresent());
         assertEquals(book, foundBook.get());
-        verify(bookRepo, times(1)).findById(bookId);
+        verify(bookRepository, times(1)).findById(bookId);
     }
 
     /**
@@ -180,7 +184,7 @@ public class BookServiceTest {
      */
     @Test
     public void testGetBookById_BookNotFound() {
-        when(bookRepo.findById(bookId)).thenReturn(Optional.empty());
+        when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
         Optional<Book> foundBook = bookService.getBookById(bookId);
 
         assertTrue(foundBook.isEmpty());
@@ -191,11 +195,11 @@ public class BookServiceTest {
      */
     @Test
     public void testFindBookByTitle_Success() {
-        when(bookRepo.findByTitle(book.getTitle())).thenReturn(List.of(book));
+        when(bookRepository.findByTitle(book.getTitle())).thenReturn(List.of(book));
         List<Book> foundBook = bookService.getBooksByTitle(book.getTitle());
         assertFalse(foundBook.isEmpty());
         assertEquals(foundBook.getFirst(), book);
-        verify(bookRepo, times(1)).findByTitle(book.getTitle());
+        verify(bookRepository, times(1)).findByTitle(book.getTitle());
     }
 
     /**
@@ -204,7 +208,7 @@ public class BookServiceTest {
      */
     @Test
     public void testFindBookByTitle_BookNotFound() {
-        when(bookRepo.findByTitle("NotFoundTitle")).thenReturn(List.of());
+        when(bookRepository.findByTitle("NotFoundTitle")).thenReturn(List.of());
 
         Assertions.assertThrows(NoSuchElementException.class, () -> bookService.getBooksByTitle("NotFoundTitle"));
     }
