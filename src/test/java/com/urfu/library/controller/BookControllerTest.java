@@ -29,7 +29,7 @@ public class BookControllerTest {
     private BookController bookController;
 
     private MockMvc mockMvc;
-    private UUID bookId;
+    private Integer bookId;
     private Book book;
 
     @BeforeEach
@@ -37,7 +37,7 @@ public class BookControllerTest {
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(bookController).setControllerAdvice(BookControllerAdvice.class).build();
 
-        bookId = UUID.randomUUID();
+        bookId = 1;
         book = new Book();
         book.setTitle("Test Title");
         book.setAuthor("Test Author");
@@ -76,7 +76,7 @@ public class BookControllerTest {
      */
     @Test
     public void testUpdateBookInfo_Success() throws Exception {
-        when(bookService.updateBookInfo(any(UUID.class), any(Book.class)))
+        when(bookService.updateBookInfo(any(Integer.class), any(Book.class)))
                 .thenReturn(Optional.of(book));
 
         mockMvc.perform(put("/api/book/{bookId}", bookId)
@@ -84,7 +84,7 @@ public class BookControllerTest {
                         .content("{ \"title\": \"Updated Title\", \"author\": \"Updated Author\", \"description\": \"Updated Description\" }"))
                 .andExpect(status().isOk());
 
-        verify(bookService, times(1)).updateBookInfo(any(UUID.class), any(Book.class));
+        verify(bookService, times(1)).updateBookInfo(any(Integer.class), any(Book.class));
     }
 
     /**
@@ -98,7 +98,7 @@ public class BookControllerTest {
                         .content("{ \"title\": null, \"author\": \"Updated Author\", \"description\": \"Updated Description\" }"))
                 .andExpect(status().isUnprocessableEntity());
 
-        verify(bookService, never()).updateBookInfo(any(UUID.class), any(Book.class));
+        verify(bookService, never()).updateBookInfo(any(Integer.class), any(Book.class));
     }
 
     /**
@@ -107,7 +107,7 @@ public class BookControllerTest {
      */
     @Test
     public void testUpdateBookInfo_NotFound() throws Exception {
-        when(bookService.updateBookInfo(any(UUID.class), any(Book.class)))
+        when(bookService.updateBookInfo(any(Integer.class), any(Book.class)))
                 .thenReturn(Optional.empty());
 
         mockMvc.perform(put("/api/book/{bookId}", bookId)
@@ -115,7 +115,7 @@ public class BookControllerTest {
                         .content("{ \"title\": \"Updated Title\", \"author\": \"Updated Author\", \"description\": \"Updated Description\" }"))
                 .andExpect(status().isNoContent());
 
-        verify(bookService, times(1)).updateBookInfo(any(UUID.class), any(Book.class));
+        verify(bookService, times(1)).updateBookInfo(any(Integer.class), any(Book.class));
     }
 
     /**
@@ -149,6 +149,7 @@ public class BookControllerTest {
     /**
      * Тестирует успешное добавление новой книги.
      * Ожидает возвращение статуса 200 OK
+     * @author Alexandr Filatov
      */
     @Test
     public void testSaveBook_Success() throws Exception {
@@ -162,6 +163,7 @@ public class BookControllerTest {
     /**
      * Тестирует валидацию при добавлении книги.
      * В случае нулевого значения хотя бы одного из полей отдает 422 Unprocessable Entity
+     * @author Alexandr Filatov
      */
     @Test
     public void testSaveBook_UnprocessableEntity() throws Exception {
@@ -175,10 +177,11 @@ public class BookControllerTest {
     /**
      * Тестирует получение книги по Id.
      * Ожидает возвращение статуса 200 Ok и соответствующей книги
+     * @author Alexandr Filatov
      */
     @Test
     public void testGetBook_Success() throws Exception {
-        when(bookService.getBookById(bookId)).thenReturn(Optional.of(book));
+        when(bookService.getBookById(bookId)).thenReturn(book);
         mockMvc.perform(get("/api/book/{bookId}", bookId))
                 .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.title").value("Test Title"))
@@ -191,10 +194,11 @@ public class BookControllerTest {
     /**
      * Тестирует получение несуществующей книги по Id.
      * Ожидает возвращение статуса 404 Not Found
+     * @author Alexandr Filatov
      */
     @Test
     public void testGetBook_NotFound() throws Exception {
-        when(bookService.getBookById(bookId)).thenReturn(Optional.empty());
+        when(bookService.getBookById(bookId)).thenThrow(NoSuchElementException.class);
         mockMvc.perform(get("/api/book/{bookId}", bookId))
                 .andExpect(status().isNotFound());
 
@@ -204,6 +208,7 @@ public class BookControllerTest {
     /**
      * Тестирует поиск книги по названию.
      * Ожидает статус 200 Ok и соответствующую книгу
+     * @author Alexandr Filatov
      */
     @Test
     public void testGetBooksByTitle_Success() throws Exception {
@@ -218,6 +223,7 @@ public class BookControllerTest {
     /**
      * Тестирует поиск по названию несуществующей книги.
      * Ожидает возвращение статуса 404 Not Found
+     * @author Alexandr Filatov
      */
     @Test
     public void testGetBooksByTitle_NotFound() throws Exception {

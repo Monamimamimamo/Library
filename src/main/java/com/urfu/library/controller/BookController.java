@@ -54,7 +54,7 @@ public class BookController {
      * HttpStatus: UNPROCESSABLE_ENTITY, в случае некорректности входных данных для книги.
      */
     @PutMapping("/{bookId}")
-    public ResponseEntity<Object> updateBookInfo(@PathVariable("bookId") UUID bookId, @RequestBody Book newBook) {
+    public ResponseEntity<Object> updateBookInfo(@PathVariable("bookId") Integer bookId, @RequestBody Book newBook) {
         if (newBook.getTitle() == null || newBook.getAuthor() == null || newBook.getDescription() == null)
             return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
 
@@ -73,7 +73,7 @@ public class BookController {
      * HttpStatus: NO_CONTENT, в случае отсутствия искомой книги в БД.Ъ
      */
     @DeleteMapping("/{bookId}")
-    public ResponseEntity<Object> deleteBook(@PathVariable("bookId") UUID bookId) {
+    public ResponseEntity<Object> deleteBook(@PathVariable("bookId") Integer bookId) {
         boolean deleted = bookService.deleteBook(bookId);
         if (deleted)
             return new ResponseEntity<>(HttpStatus.OK);
@@ -88,6 +88,7 @@ public class BookController {
      *     <li>201 Created</li>
      *     <li>422 Unprocessable Entity</li>
      * </ul>
+     * @author Alexandr Filatov
      */
     @PostMapping
     public ResponseEntity<Object> createBook(@Valid @RequestBody Book book) {
@@ -103,11 +104,12 @@ public class BookController {
      *     <li>200 Success</li>
      *     <li>404 Not Found</li>
      * </ul>
+     * @author Alexandr Filatov
      */
     @GetMapping("/{bookId}")
-    public ResponseEntity<Book> getBook(@PathVariable("bookId") UUID bookId) {
-        Optional<Book> book = bookService.getBookById(bookId);
-        return ResponseEntity.ok().body(book.get());
+    public ResponseEntity<Book> getBook(@PathVariable("bookId") Integer bookId) {
+        Book book = bookService.getBookById(bookId);
+        return ResponseEntity.ok().body(book);
     }
 
     /**
@@ -118,6 +120,7 @@ public class BookController {
      *     <li>200 Success</li>
      *     <li>404 Not Found</li>
      * </ul>
+     * @author Alexandr Filatov
      */
     @GetMapping
     public ResponseEntity<List<Book>> getBooksByTitle(@RequestParam String title) {

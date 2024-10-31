@@ -7,13 +7,12 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.Objects;
-import java.util.UUID;
 
 @Entity
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private Integer id;
     @NotBlank(message = "Title must be not null")
     private String title;
     @NotBlank(message = "Author must be not null")
@@ -21,8 +20,12 @@ public class Book {
     @NotBlank(message = "Description must be not null")
     private String description;
 
-    public UUID getId() {
+    public Integer getId() {
         return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -35,10 +38,6 @@ public class Book {
 
     public String getAuthor() {
         return author;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     public void setAuthor(String author) {
