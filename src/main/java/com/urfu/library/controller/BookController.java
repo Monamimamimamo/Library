@@ -31,7 +31,7 @@ public class BookController {
 
     /**
      * Получает список всех книг.
-     * @return ResponseEntity с списком книг и статусом HTTP.
+     * @return ResponseEntity со списком книг и статусом HTTP.
      * HttpStatus: OK, в случае успеха.
      * HttpStatus: NO_CONTENT, в случае отсутствия книг в БД.
      */
@@ -105,7 +105,7 @@ public class BookController {
      * </ul>
      */
     @GetMapping("/{bookId}")
-    public ResponseEntity<Object> getBook(@PathVariable("bookId") UUID bookId) {
+    public ResponseEntity<Book> getBook(@PathVariable("bookId") UUID bookId) {
         Optional<Book> book = bookService.getBookById(bookId);
         return ResponseEntity.ok().body(book.get());
     }
@@ -120,7 +120,7 @@ public class BookController {
      * </ul>
      */
     @GetMapping
-    public ResponseEntity<Object> getBooksByTitle(@RequestParam String title) {
+    public ResponseEntity<List<Book>> getBooksByTitle(@RequestParam String title) {
         List<Book> books = bookService.getBooksByTitle(title);
         return ResponseEntity.ok().body(books);
     }

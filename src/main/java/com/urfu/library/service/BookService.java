@@ -1,7 +1,7 @@
 package com.urfu.library.service;
 
 import com.urfu.library.model.Book;
-import com.urfu.library.model.BookRepo;
+import com.urfu.library.model.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,11 +14,11 @@ import java.util.*;
 @Service
 public class BookService {
 
-    private final BookRepo bookRepo;
+    private final BookRepository bookRepository;
 
     @Autowired
-    public BookService(BookRepo bookRepo) {
-        this.bookRepo = bookRepo;
+    public BookService(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
     }
 
     /**
@@ -26,7 +26,7 @@ public class BookService {
      * Или пустой список, в случае отсутствия книг.
      */
     public List<Book> getAllBooks() {
-        return bookRepo.findAll();
+        return bookRepository.findAll();
     }
 
     /**
@@ -37,14 +37,14 @@ public class BookService {
      * @return Объект Optional, содержащий обновленную книгу, если книга с заданным идентификатором найдена, иначе пустой Optional.
      */
     public Optional<Book> updateBookInfo(UUID bookId, Book newBookData) {
-        Optional<Book> existingBook = bookRepo.findById(bookId);
+        Optional<Book> existingBook = bookRepository.findById(bookId);
         if (existingBook.isPresent()) {
             Book book = existingBook.get();
             book.setTitle(newBookData.getTitle());
             book.setAuthor(newBookData.getAuthor());
             book.setDescription(newBookData.getDescription());
 
-            bookRepo.save(book);
+            bookRepository.save(book);
             return Optional.of(book);
         }
         return Optional.empty();
@@ -57,10 +57,10 @@ public class BookService {
      * @return true, если книга была успешно удалена; false, если книга с заданным идентификатором не найдена.
      */
     public boolean deleteBook(UUID bookId) {
-        Optional<Book> book = bookRepo.findById(bookId);
+        Optional<Book> book = bookRepository.findById(bookId);
         if (book.isEmpty())
             return false;
-        bookRepo.deleteById(bookId);
+        bookRepository.deleteById(bookId);
         return true;
     }
 
@@ -69,7 +69,7 @@ public class BookService {
      * @param newBook Книга для сохранения
      */
     public void saveBook(Book newBook) {
-        bookRepo.save(newBook);
+        bookRepository.save(newBook);
     }
 
     /**
@@ -78,7 +78,7 @@ public class BookService {
      * @return найденную книгу
      */
     public Optional<Book> getBookById(UUID bookId) {
-        return bookRepo.findById(bookId);
+        return bookRepository.findById(bookId);
     }
 
     /**
@@ -88,7 +88,7 @@ public class BookService {
      * @throws NoSuchElementException если книги по запрашиваемому названию не найдены
      */
     public List<Book> getBooksByTitle(String title) {
-        List<Book> books = bookRepo.findByTitle(title);
+        List<Book> books = bookRepository.findByTitle(title);
         if(books.isEmpty()){
             throw new NoSuchElementException();
         } else {

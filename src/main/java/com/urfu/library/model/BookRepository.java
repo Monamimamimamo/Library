@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface BookRepo extends JpaRepository<Book, UUID> {
+public interface BookRepository extends JpaRepository<Book, UUID> {
     List<Book> findByTitle(String author);
 }
