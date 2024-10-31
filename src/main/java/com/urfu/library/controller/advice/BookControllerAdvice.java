@@ -15,12 +15,14 @@ import java.util.NoSuchElementException;
 
 /**
  * ControllerAdvice для BookController, отвечает за обработку ошибок и отправку корректных HTTP статусов
+ * @author Alexandr Filatov
  */
 @ControllerAdvice(annotations = RestController.class)
 public class BookControllerAdvice extends ResponseEntityExceptionHandler {
 
     /**
      * Отдает статус 404 Not Found в случае выброса NoSuchElementException
+     * @author Alexandr Filatov
      */
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<Object> handleException(NoSuchElementException e) {
@@ -29,6 +31,7 @@ public class BookControllerAdvice extends ResponseEntityExceptionHandler {
 
     /**
      * Отдает статус 422 Unprocessable Entity в случае не валидных аргументов метода
+     * @author Alexandr Filatov
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception,

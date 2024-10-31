@@ -36,7 +36,7 @@ public class BookService {
      * @param newBookData Новый объект книги с обновленной информацией.
      * @return Объект Optional, содержащий обновленную книгу, если книга с заданным идентификатором найдена, иначе пустой Optional.
      */
-    public Optional<Book> updateBookInfo(UUID bookId, Book newBookData) {
+    public Optional<Book> updateBookInfo(Integer bookId, Book newBookData) {
         Optional<Book> existingBook = bookRepository.findById(bookId);
         if (existingBook.isPresent()) {
             Book book = existingBook.get();
@@ -56,7 +56,7 @@ public class BookService {
      * @param bookId Идентификатор книги, которую нужно удалить.
      * @return true, если книга была успешно удалена; false, если книга с заданным идентификатором не найдена.
      */
-    public boolean deleteBook(UUID bookId) {
+    public boolean deleteBook(Integer bookId) {
         Optional<Book> book = bookRepository.findById(bookId);
         if (book.isEmpty())
             return false;
@@ -67,18 +67,25 @@ public class BookService {
     /**
      * Сохраняет книгу в базу данных
      * @param newBook Книга для сохранения
+     * @author Alexandr Filatov
      */
     public void saveBook(Book newBook) {
         bookRepository.save(newBook);
     }
 
     /**
-     * Возвращет книгу по ID
+     * Возвращает книгу по ID
      * @param bookId ID книги
      * @return найденную книгу
+     * @author Alexandr Filatov
      */
-    public Optional<Book> getBookById(UUID bookId) {
-        return bookRepository.findById(bookId);
+    public Book getBookById(Integer bookId) {
+        Optional<Book> foundBook = bookRepository.findById(bookId);
+        if (foundBook.isPresent()) {
+            return foundBook.get();
+        } else {
+            throw new NoSuchElementException();
+        }
     }
 
     /**
@@ -86,6 +93,7 @@ public class BookService {
      * @param title название книги
      * @return найденные книги
      * @throws NoSuchElementException если книги по запрашиваемому названию не найдены
+     * @author Alexandr Filatov
      */
     public List<Book> getBooksByTitle(String title) {
         List<Book> books = bookRepository.findByTitle(title);

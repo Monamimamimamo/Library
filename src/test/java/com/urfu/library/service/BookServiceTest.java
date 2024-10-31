@@ -27,12 +27,12 @@ public class BookServiceTest {
     private BookService bookService;
 
     private Book book;
-    private UUID bookId;
+    private Integer bookId;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        bookId = UUID.randomUUID();
+        bookId = 1;
         book = new Book();
         book.setTitle("Test Title");
         book.setAuthor("Test Author");
@@ -131,11 +131,12 @@ public class BookServiceTest {
         boolean result = bookService.deleteBook(bookId);
 
         assertFalse(result);
-        verify(bookRepository, never()).deleteById(any(UUID.class));
+        verify(bookRepository, never()).deleteById(any(Integer.class));
     }
 
     /**
      * Тестирует добавление новой книги
+     * @author Alexandr Filatov
      */
     @Test
     public void testCreateBook_Success() {
@@ -151,6 +152,7 @@ public class BookServiceTest {
     /**
      * Проверка на создание некорректного экземпляра книги,
      * в бд ничего сохранено не будет
+     * @author Alexandr Filatov
      */
     @Test
     public void testCreateBook_UnprocessableEntity() {
@@ -167,31 +169,33 @@ public class BookServiceTest {
 
     /**
      * Тестирует получение книги по Id
+     * @author Alexandr Filatov
      */
     @Test
     public void testGetBookById_Success() {
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
 
-        Optional<Book> foundBook = bookService.getBookById(bookId);
+        Book foundBook = bookService.getBookById(bookId);
 
-        assertTrue(foundBook.isPresent());
-        assertEquals(book, foundBook.get());
+        assertEquals(book, foundBook);
         verify(bookRepository, times(1)).findById(bookId);
     }
 
     /**
-     * Проверка на возвращение Optional.empty() в случае отсутствия книги в бд
+     * Тестирует выбрасывание ошибки NoSuchElementException
+     * в случае отсутствия книги с заданным ID в бд
+     * @author Alexandr Filatov
      */
     @Test
     public void testGetBookById_BookNotFound() {
         when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
-        Optional<Book> foundBook = bookService.getBookById(bookId);
 
-        assertTrue(foundBook.isEmpty());
+        Assertions.assertThrows(NoSuchElementException.class, () -> bookService.getBookById(2));
     }
 
     /**
      * Тестирует поиск книги по названию
+     * @author Alexandr Filatov
      */
     @Test
     public void testFindBookByTitle_Success() {
@@ -205,6 +209,7 @@ public class BookServiceTest {
     /**
      * Тестирует выбрасывание ошибки NoSuchElementException
      * в случае отсутствия книги с заданным названием в бд
+     * @author Alexandr Filatov
      */
     @Test
     public void testFindBookByTitle_BookNotFound() {
