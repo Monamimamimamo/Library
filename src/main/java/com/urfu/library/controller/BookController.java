@@ -61,7 +61,7 @@ public class BookController {
         Optional<Book> updatedBook = bookService.updateBookInfo(bookId, newBook);
         if (updatedBook.isPresent())
             return new ResponseEntity<>(HttpStatus.OK);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     /**

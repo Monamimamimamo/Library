@@ -110,7 +110,7 @@ public class BookControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.put("/api/book/{bookId}", bookId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{ \"title\": \"Updated Title\", \"author\": \"Updated Author\", \"description\": \"Updated Description\" }"))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
 
         Mockito.verify(bookService, Mockito.times(1)).updateBookInfo(ArgumentMatchers.any(Integer.class), ArgumentMatchers.any(Book.class));
     }
