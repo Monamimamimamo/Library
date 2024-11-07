@@ -26,7 +26,7 @@ public class BookControllerTest {
     private BookController bookController;
 
     private MockMvc mockMvc;
-    private Integer bookId;
+    private Long bookId;
     private Book book;
 
     @BeforeEach
@@ -34,7 +34,7 @@ public class BookControllerTest {
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(bookController).setControllerAdvice(BookControllerAdvice.class).build();
 
-        bookId = 1;
+        bookId = 1L;
         book = new Book();
         book.setTitle("Test Title");
         book.setAuthor("Test Author");
@@ -73,7 +73,7 @@ public class BookControllerTest {
      */
     @Test
     public void testUpdateBookInfo_Success() throws Exception {
-        Mockito.when(bookService.updateBookInfo(ArgumentMatchers.any(Integer.class), ArgumentMatchers.any(Book.class)))
+        Mockito.when(bookService.updateBookInfo(ArgumentMatchers.any(Long.class), ArgumentMatchers.any(Book.class)))
                 .thenReturn(Optional.of(book));
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/book/{bookId}", bookId)
@@ -81,7 +81,7 @@ public class BookControllerTest {
                         .content("{ \"title\": \"Updated Title\", \"author\": \"Updated Author\", \"description\": \"Updated Description\" }"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        Mockito.verify(bookService, Mockito.times(1)).updateBookInfo(ArgumentMatchers.any(Integer.class), ArgumentMatchers.any(Book.class));
+        Mockito.verify(bookService, Mockito.times(1)).updateBookInfo(ArgumentMatchers.any(Long.class), ArgumentMatchers.any(Book.class));
     }
 
     /**
@@ -95,7 +95,7 @@ public class BookControllerTest {
                         .content("{ \"title\": null, \"author\": \"Updated Author\", \"description\": \"Updated Description\" }"))
                 .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity());
 
-        Mockito.verify(bookService, Mockito.never()).updateBookInfo(ArgumentMatchers.any(Integer.class), ArgumentMatchers.any(Book.class));
+        Mockito.verify(bookService, Mockito.never()).updateBookInfo(ArgumentMatchers.any(Long.class), ArgumentMatchers.any(Book.class));
     }
 
     /**
@@ -104,7 +104,7 @@ public class BookControllerTest {
      */
     @Test
     public void testUpdateBookInfo_NotFound() throws Exception {
-        Mockito.when(bookService.updateBookInfo(ArgumentMatchers.any(Integer.class), ArgumentMatchers.any(Book.class)))
+        Mockito.when(bookService.updateBookInfo(ArgumentMatchers.any(Long.class), ArgumentMatchers.any(Book.class)))
                 .thenReturn(Optional.empty());
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/book/{bookId}", bookId)
@@ -112,7 +112,7 @@ public class BookControllerTest {
                         .content("{ \"title\": \"Updated Title\", \"author\": \"Updated Author\", \"description\": \"Updated Description\" }"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
 
-        Mockito.verify(bookService, Mockito.times(1)).updateBookInfo(ArgumentMatchers.any(Integer.class), ArgumentMatchers.any(Book.class));
+        Mockito.verify(bookService, Mockito.times(1)).updateBookInfo(ArgumentMatchers.any(Long.class), ArgumentMatchers.any(Book.class));
     }
 
     /**
@@ -154,7 +154,7 @@ public class BookControllerTest {
                 .content("{ \"title\": \"Test Title\", \"author\": \"Test Author\", \"description\": \"Test Description\" }"))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
-        Mockito.verify(bookService, Mockito.times(1)).saveBook(ArgumentMatchers.any(Book.class));
+        Mockito.verify(bookService, Mockito.times(1)).saveBook(book);
     }
 
     /**
@@ -178,7 +178,7 @@ public class BookControllerTest {
      */
     @Test
     public void testGetBook_Success() throws Exception {
-        Mockito.when(bookService.getBookById(bookId)).thenReturn(book);
+        Mockito.when(bookService.getBookById(bookId)).thenReturn(Optional.of(book));
         mockMvc.perform(MockMvcRequestBuilders.get("/api/book/{bookId}", bookId))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Test Title"))
@@ -195,7 +195,7 @@ public class BookControllerTest {
      */
     @Test
     public void testGetBook_NotFound() throws Exception {
-        Mockito.when(bookService.getBookById(bookId)).thenThrow(NoSuchElementException.class);
+        Mockito.when(bookService.getBookById(bookId)).thenReturn(Optional.empty());
         mockMvc.perform(MockMvcRequestBuilders.get("/api/book/{bookId}", bookId))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
 
@@ -224,7 +224,7 @@ public class BookControllerTest {
      */
     @Test
     public void testGetBooksByTitle_NotFound() throws Exception {
-        Mockito.when(bookService.getBooksByTitle(book.getTitle())).thenThrow(NoSuchElementException.class);
+        Mockito.when(bookService.getBooksByTitle(book.getTitle())).thenReturn(List.of());
         mockMvc.perform(MockMvcRequestBuilders.get("/api/book?title={title}", book.getTitle()))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
 

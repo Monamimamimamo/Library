@@ -8,11 +8,14 @@ import jakarta.validation.constraints.NotBlank;
 
 import java.util.Objects;
 
+/**
+ * Сущность книги
+ */
 @Entity
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private Long id;
     @NotBlank(message = "Title must be not null")
     private String title;
     @NotBlank(message = "Author must be not null")
@@ -20,11 +23,34 @@ public class Book {
     @NotBlank(message = "Description must be not null")
     private String description;
 
-    public Integer getId() {
+    /**
+     * Конструктор с явным указанием всех значений для полей сущности
+     */
+    public Book(Long id, String title, String author, String description) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.description = description;
+    }
+
+    /**
+     * Конструктор с указанием значений для всех полей, кроме ID - генерируется автоматически
+     */
+    public Book(String title, String author, String description) {
+        this.title = title;
+        this.author = author;
+        this.description = description;
+    }
+
+    public Book(){
+        super();
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -66,11 +92,11 @@ public class Book {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Book book)) return false;
-        return Objects.equals(id, book.id) && Objects.equals(title, book.title) && Objects.equals(author, book.author) && Objects.equals(description, book.description);
+        return Objects.equals(id, book.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, author, description);
+        return Objects.hashCode(id);
     }
 }

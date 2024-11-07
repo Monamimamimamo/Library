@@ -36,7 +36,7 @@ public class BookService {
      * @param newBookData Новый объект книги с обновленной информацией.
      * @return Объект Optional, содержащий обновленную книгу, если книга с заданным идентификатором найдена, иначе пустой Optional.
      */
-    public Optional<Book> updateBookInfo(Integer bookId, Book newBookData) {
+    public Optional<Book> updateBookInfo(Long bookId, Book newBookData) {
         Optional<Book> existingBook = bookRepository.findById(bookId);
         if (existingBook.isPresent()) {
             Book book = existingBook.get();
@@ -56,7 +56,7 @@ public class BookService {
      * @param bookId Идентификатор книги, которую нужно удалить.
      * @return true, если книга была успешно удалена; false, если книга с заданным идентификатором не найдена.
      */
-    public boolean deleteBook(Integer bookId) {
+    public boolean deleteBook(Long bookId) {
         Optional<Book> book = bookRepository.findById(bookId);
         if (book.isEmpty())
             return false;
@@ -66,7 +66,7 @@ public class BookService {
 
     /**
      * Сохраняет книгу в базу данных
-     * @param newBook Книга для сохранения
+     * @param newBook книга для сохранения
      * @author Alexandr Filatov
      */
     public void saveBook(Book newBook) {
@@ -79,28 +79,16 @@ public class BookService {
      * @return найденную книгу
      * @author Alexandr Filatov
      */
-    public Book getBookById(Integer bookId) {
-        Optional<Book> foundBook = bookRepository.findById(bookId);
-        if (foundBook.isPresent()) {
-            return foundBook.get();
-        } else {
-            throw new NoSuchElementException();
-        }
+    public Optional<Book> getBookById(Long bookId) {
+        return bookRepository.findById(bookId);
     }
 
     /**
      * Возвращает список книг по названию
      * @param title название книги
      * @return найденные книги
-     * @throws NoSuchElementException если книги по запрашиваемому названию не найдены
-     * @author Alexandr Filatov
      */
     public List<Book> getBooksByTitle(String title) {
-        List<Book> books = bookRepository.findByTitle(title);
-        if(books.isEmpty()){
-            throw new NoSuchElementException();
-        } else {
-            return books;
-        }
+        return bookRepository.findByTitle(title);
     }
 }

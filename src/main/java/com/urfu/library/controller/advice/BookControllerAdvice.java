@@ -6,12 +6,9 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-import java.util.NoSuchElementException;
 
 /**
  * ControllerAdvice для BookController, отвечает за обработку ошибок и отправку корректных HTTP статусов
@@ -19,18 +16,8 @@ import java.util.NoSuchElementException;
  */
 @ControllerAdvice(annotations = RestController.class)
 public class BookControllerAdvice extends ResponseEntityExceptionHandler {
-
     /**
-     * Отдает статус 404 Not Found в случае выброса NoSuchElementException
-     * @author Alexandr Filatov
-     */
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<Object> handleException(NoSuchElementException e) {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    /**
-     * Отдает статус 422 Unprocessable Entity в случае не валидных аргументов метода
+     * Отдает статус 422 Unprocessable Entity в случае невалидных аргументов метода
      * @author Alexandr Filatov
      */
     @Override

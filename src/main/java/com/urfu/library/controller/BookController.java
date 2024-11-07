@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Контроллер для управления операциями с книгами.
@@ -54,7 +53,7 @@ public class BookController {
      * HttpStatus: UNPROCESSABLE_ENTITY, в случае некорректности входных данных для книги.
      */
     @PutMapping("/{bookId}")
-    public ResponseEntity<Object> updateBookInfo(@PathVariable("bookId") Integer bookId, @RequestBody Book newBook) {
+    public ResponseEntity<Object> updateBookInfo(@PathVariable("bookId") Long bookId, @RequestBody Book newBook) {
         if (newBook.getTitle() == null || newBook.getAuthor() == null || newBook.getDescription() == null)
             return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
 
@@ -73,7 +72,7 @@ public class BookController {
      * HttpStatus: NO_CONTENT, в случае отсутствия искомой книги в БД.Ъ
      */
     @DeleteMapping("/{bookId}")
-    public ResponseEntity<Object> deleteBook(@PathVariable("bookId") Integer bookId) {
+    public ResponseEntity<Object> deleteBook(@PathVariable("bookId") Long bookId) {
         boolean deleted = bookService.deleteBook(bookId);
         if (deleted)
             return new ResponseEntity<>(HttpStatus.OK);
@@ -107,9 +106,12 @@ public class BookController {
      * @author Alexandr Filatov
      */
     @GetMapping("/{bookId}")
-    public ResponseEntity<Book> getBook(@PathVariable("bookId") Integer bookId) {
-        Book book = bookService.getBookById(bookId);
-        return ResponseEntity.ok().body(book);
+    public ResponseEntity<Book> getBook(@PathVariable("bookId") Long bookId) {
+        Optional<Book> book = bookService.getBookById(bookId);
+        if (book.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(book.get(), HttpStatus.OK);
     }
 
     /**
@@ -125,6 +127,9 @@ public class BookController {
     @GetMapping
     public ResponseEntity<List<Book>> getBooksByTitle(@RequestParam String title) {
         List<Book> books = bookService.getBooksByTitle(title);
-        return ResponseEntity.ok().body(books);
+        if (books.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(books, HttpStatus.OK);
     }
 }
