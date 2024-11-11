@@ -2,6 +2,7 @@ package com.urfu.library.controller;
 
 import com.urfu.library.model.Book;
 import com.urfu.library.service.BookService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -89,6 +90,7 @@ public class BookController {
      * </ul>
      * @author Alexandr Filatov
      */
+    @RolesAllowed("ROLE_ADMIN")
     @PostMapping
     public ResponseEntity<Object> createBook(@Valid @RequestBody Book book) {
         bookService.saveBook(book);
