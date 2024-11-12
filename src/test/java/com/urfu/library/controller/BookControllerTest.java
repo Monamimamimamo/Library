@@ -35,12 +35,12 @@ public class BookControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(bookController).setControllerAdvice(BookControllerAdvice.class).build();
 
         bookId = 1L;
-        book = new Book("Test Title", "Test Author", "Test Description");
+        book = new Book("Test Title", "Test Author", "Test Description", false);
     }
 
     /**
      * Тестирует успешное получение всех книг.
-     * Что вернётся статус 200 OK.
+     * Ожидается, что вернётся статус 200 OK.
      */
     @Test
     public void testGetAllBooks_Success() throws Exception {
@@ -53,7 +53,7 @@ public class BookControllerTest {
 
     /**
      * Тестирует запрос при отсутствии книг в БД.
-     * Что вернётся статус 204 OK.
+     * Ожидается, что вернётся статус 204 NO_CONTENT.
      */
     @Test
     public void testGetAllBooks_NotFound() throws Exception {
@@ -80,7 +80,7 @@ public class BookControllerTest {
 
         Mockito.verify(bookService, Mockito.times(1)).updateBookInfo(
                 bookId,
-                new Book("Updated Title", "Updated Author", "Updated Description"));
+                new Book("Updated Title", "Updated Author", "Updated Description", false));
     }
 
     /**
@@ -113,7 +113,7 @@ public class BookControllerTest {
 
         Mockito.verify(bookService, Mockito.times(1)).updateBookInfo(
                 bookId,
-                new Book("Updated Title", "Updated Author", "Updated Description"));
+                new Book("Updated Title", "Updated Author", "Updated Description", false));
     }
 
     /**

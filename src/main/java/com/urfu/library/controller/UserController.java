@@ -27,6 +27,8 @@ public class UserController {
 
     /**
      * Создание аккаунта пользователя
+     * HttpStatus: CREATED, в случае успеха.
+     * HttpStatus: UNPROCESSABLE_ENTITY, в случае существования пользователя с таким именем или некоректного ввода данных.
      * @author Alexandr FIlatov
      */
     @PostMapping("/api/signup")
@@ -39,6 +41,9 @@ public class UserController {
 
     /**
      * Создание аккаунта администратора
+     * HttpStatus: CREATED, в случае успеха.
+     * HttpStatus: UNPROCESSABLE_ENTITY, в случае существования админа с таким именем или некоректного ввода данных.
+     * HttpStatus: FORBIDDEN, в случае, если пользователь не является Админом.
      * @author Alexandr FIlatov
      */
     @PostMapping("/api/admin/signup")

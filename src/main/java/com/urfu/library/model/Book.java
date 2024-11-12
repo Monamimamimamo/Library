@@ -23,27 +23,39 @@ public class Book {
     @NotBlank(message = "Description must be not null")
     private String description;
 
+    private boolean isReserved;
+
     /**
      * Конструктор с явным указанием всех значений для полей сущности
      */
-    public Book(Long id, String title, String author, String description) {
+    public Book(Long id, String title, String author, String description, boolean isReserved) {
         this.id = id;
         this.title = title;
         this.author = author;
         this.description = description;
+        this.isReserved = isReserved;
     }
 
     /**
      * Конструктор с указанием значений для всех полей, кроме ID - генерируется автоматически
      */
-    public Book(String title, String author, String description) {
+    public Book(String title, String author, String description, boolean isReserved) {
         this.title = title;
         this.author = author;
         this.description = description;
+        this.isReserved = isReserved;
     }
 
     public Book(){
         super();
+    }
+
+    public boolean isReserved() {
+        return isReserved;
+    }
+
+    public void setReserved(boolean reserved) {
+        isReserved = reserved;
     }
 
     public Long getId() {
