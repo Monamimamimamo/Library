@@ -27,10 +27,7 @@ public class BookServiceTest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         bookId = 1L;
-        book = new Book();
-        book.setTitle("Test Title");
-        book.setAuthor("Test Author");
-        book.setDescription("Test Description");
+        book = new Book("Test Title", "Test Author", "Test Description", false);
     }
 
     /**
@@ -61,7 +58,6 @@ public class BookServiceTest {
         List<Book> result = bookService.getAllBooks();
 
         Assertions.assertTrue(result.isEmpty());
-        Assertions.assertEquals(0, result.size());
         Mockito.verify(bookRepository, Mockito.times(1)).findAll();
     }
 
@@ -72,17 +68,14 @@ public class BookServiceTest {
      */
     @Test
     public void testUpdateBookInfo_Success() {
-        Book newBookData = new Book();
-        newBookData.setTitle("Updated Title");
-        newBookData.setAuthor("Updated Author");
-        newBookData.setDescription("Updated Description");
+        Book newBookData = new Book("Updated Title", "Updated Author", "Updated Description", false);
 
         Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         Optional<Book> updatedBook = bookService.updateBookInfo(bookId, newBookData);
 
         Assertions.assertTrue(updatedBook.isPresent());
         Assertions.assertEquals("Updated Title", updatedBook.get().getTitle());
-        Mockito.verify(bookRepository, Mockito.times(1)).save(ArgumentMatchers.any(Book.class));
+        Mockito.verify(bookRepository, Mockito.times(1)).save(newBookData);
     }
 
     /**

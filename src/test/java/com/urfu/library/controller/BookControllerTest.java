@@ -35,15 +35,12 @@ public class BookControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(bookController).setControllerAdvice(BookControllerAdvice.class).build();
 
         bookId = 1L;
-        book = new Book();
-        book.setTitle("Test Title");
-        book.setAuthor("Test Author");
-        book.setDescription("Test Description");
+        book = new Book("Test Title", "Test Author", "Test Description", false);
     }
 
     /**
      * Тестирует успешное получение всех книг.
-     * Что вернётся статус 200 OK.
+     * Ожидается, что вернётся статус 200 OK.
      */
     @Test
     public void testGetAllBooks_Success() throws Exception {
@@ -56,7 +53,7 @@ public class BookControllerTest {
 
     /**
      * Тестирует запрос при отсутствии книг в БД.
-     * Что вернётся статус 204 OK.
+     * Ожидается, что вернётся статус 204 NO_CONTENT.
      */
     @Test
     public void testGetAllBooks_NotFound() throws Exception {
@@ -81,7 +78,9 @@ public class BookControllerTest {
                         .content("{ \"title\": \"Updated Title\", \"author\": \"Updated Author\", \"description\": \"Updated Description\" }"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        Mockito.verify(bookService, Mockito.times(1)).updateBookInfo(ArgumentMatchers.any(Long.class), ArgumentMatchers.any(Book.class));
+        Mockito.verify(bookService, Mockito.times(1)).updateBookInfo(
+                bookId,
+                new Book("Updated Title", "Updated Author", "Updated Description", false));
     }
 
     /**
@@ -100,7 +99,7 @@ public class BookControllerTest {
 
     /**
      * Тестирует сценарий, когда книга с указанным идентификатором не найдена.
-     * Этот тест проверяет, что при отсутствии книги в БД для обновления будет возвращен статус 204 No Content.
+     * Этот тест проверяет, что при отсутствии книги в БД для обновления будет возвращен статус 404 Not Found.
      */
     @Test
     public void testUpdateBookInfo_NotFound() throws Exception {
@@ -112,7 +111,9 @@ public class BookControllerTest {
                         .content("{ \"title\": \"Updated Title\", \"author\": \"Updated Author\", \"description\": \"Updated Description\" }"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
 
-        Mockito.verify(bookService, Mockito.times(1)).updateBookInfo(ArgumentMatchers.any(Long.class), ArgumentMatchers.any(Book.class));
+        Mockito.verify(bookService, Mockito.times(1)).updateBookInfo(
+                bookId,
+                new Book("Updated Title", "Updated Author", "Updated Description", false));
     }
 
     /**
