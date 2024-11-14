@@ -104,7 +104,7 @@ public class BookControllerTest {
     @Test
     public void testUpdateBookInfo_NotFound() throws Exception {
         Mockito.when(bookService.updateBookInfo(ArgumentMatchers.any(Long.class), ArgumentMatchers.any(Book.class)))
-                .thenReturn(Optional.empty());
+                .thenThrow(NoSuchElementException.class);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/book/{bookId}", bookId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -122,8 +122,6 @@ public class BookControllerTest {
      */
     @Test
     public void testDeleteBook_Success() throws Exception {
-        Mockito.when(bookService.deleteBook(bookId)).thenReturn(true);
-
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/book/{bookId}", bookId))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
@@ -132,14 +130,14 @@ public class BookControllerTest {
 
     /**
      * Тестирует сценарий, когда книга для удаления не найдена.
-     * будет возвращен статус 204 No Content.
+     * Будет возвращен статус 404 Not Found.
      */
     @Test
     public void testDeleteBook_NotFound() throws Exception {
-        Mockito.when(bookService.deleteBook(bookId)).thenReturn(false);
+        Mockito.doThrow(NoSuchElementException.class).when(bookService).deleteBook(bookId);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/book/{bookId}", bookId))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
 
         Mockito.verify(bookService, Mockito.times(1)).deleteBook(bookId);
     }

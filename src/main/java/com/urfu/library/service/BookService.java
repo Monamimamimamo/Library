@@ -34,43 +34,43 @@ public class BookService {
      *
      * @param bookId      Идентификатор книги, которую нужно обновить.
      * @param newBookData Новый объект книги с обновленной информацией.
-     * @return Объект Optional, содержащий обновленную книгу, если книга с заданным идентификатором найдена, иначе пустой Optional.
+     * @return Объект Optional, содержащий обновленную книгу, если книга с заданным идентификатором найдена
+     * @throws NoSuchElementException если книга отсутствует в системе
      */
     public Optional<Book> updateBookInfo(Long bookId, Book newBookData) {
         Optional<Book> existingBook = bookRepository.findById(bookId);
-        if (existingBook.isPresent()) {
-            Book book = existingBook.get();
-            book.setTitle(newBookData.getTitle());
-            book.setAuthor(newBookData.getAuthor());
-            book.setDescription(newBookData.getDescription());
-
-            bookRepository.save(book);
-            return Optional.of(book);
+        if (existingBook.isEmpty()) {
+            throw new NoSuchElementException("Book to update not found");
         }
-        return Optional.empty();
+        Book book = existingBook.get();
+        book.setTitle(newBookData.getTitle());
+        book.setAuthor(newBookData.getAuthor());
+        book.setDescription(newBookData.getDescription());
+
+        bookRepository.save(book);
+        return Optional.of(book);
     }
 
     /**
      * Удалить книгу из библиотеки.
      *
      * @param bookId Идентификатор книги, которую нужно удалить.
-     * @return true, если книга была успешно удалена; false, если книга с заданным идентификатором не найдена.
+     * @throws NoSuchElementException если книги нет в системе
      */
-    public boolean deleteBook(Long bookId) {
+    public void deleteBook(Long bookId) {
         Optional<Book> book = bookRepository.findById(bookId);
         if (book.isEmpty())
-            return false;
+            throw new NoSuchElementException("Book to delete not found");
         bookRepository.deleteById(bookId);
-        return true;
     }
 
     /**
      * Сохраняет книгу в базу данных
-     * @param newBook книга для сохранения
+     * @param book книга для сохранения
      * @author Alexandr Filatov
      */
-    public void saveBook(Book newBook) {
-        bookRepository.save(newBook);
+    public void saveBook(Book book) {
+        bookRepository.save(book);
     }
 
     /**
