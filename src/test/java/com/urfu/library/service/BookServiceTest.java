@@ -81,15 +81,14 @@ public class BookServiceTest {
     /**
      * Тест для проверки ситуации, когда обновление книги невозможно,
      * так как книга с указанным ID не найдена.
-     * Тест проверяет, что метод репозитория save() не вызывается,
-     * а возвращаемое значение пустое.
+     * Тест проверяет, что метод репозитория save() не вызывается
+     * и выбрасывается исключение
      */
     @Test
     public void testUpdateBookInfo_BookNotFound() {
         Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
-        Optional<Book> updatedBook = bookService.updateBookInfo(bookId, book);
 
-        Assertions.assertTrue(updatedBook.isEmpty());
+        Assertions.assertThrows(NoSuchElementException.class, () -> bookService.updateBookInfo(bookId, book), "Book to update not found");
         Mockito.verify(bookRepository, Mockito.never()).save(ArgumentMatchers.any(Book.class));
     }
 
@@ -101,23 +100,22 @@ public class BookServiceTest {
     @Test
     public void testDeleteBook_Success() {
         Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
-        boolean result = bookService.deleteBook(bookId);
+        bookService.deleteBook(bookId);
 
-        Assertions.assertTrue(result);
         Mockito.verify(bookRepository, Mockito.times(1)).deleteById(bookId);
     }
 
     /**
      * Тест для проверки ситуации, когда удаление книги невозможно,
      * так как книга с указанным ID не найдена в БД.
-     * Тест проверяет, что метод репозитория deleteById() не вызывается.
+     * Тест проверяет, что метод репозитория deleteById() не вызывается
+     * и выбрасывается исключение
      */
     @Test
     public void testDeleteBook_BookNotFound() {
         Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
-        boolean result = bookService.deleteBook(bookId);
 
-        Assertions.assertFalse(result);
+        Assertions.assertThrows(NoSuchElementException.class, () -> bookService.deleteBook(bookId), "Book to delete not found");
         Mockito.verify(bookRepository, Mockito.never()).deleteById(ArgumentMatchers.any(Long.class));
     }
 

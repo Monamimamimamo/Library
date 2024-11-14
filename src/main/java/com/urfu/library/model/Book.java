@@ -24,16 +24,6 @@ public class Book {
     private String description;
 
     /**
-     * Конструктор с явным указанием всех значений для полей сущности
-     */
-    public Book(Long id, String title, String author, String description) {
-        this.id = id;
-        this.title = title;
-        this.author = author;
-        this.description = description;
-    }
-
-    /**
      * Конструктор с указанием значений для всех полей, кроме ID - генерируется автоматически
      */
     public Book(String title, String author, String description) {

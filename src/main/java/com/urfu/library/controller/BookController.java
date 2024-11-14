@@ -54,13 +54,11 @@ public class BookController {
      */
     @PutMapping("/{bookId}")
     public ResponseEntity<Object> updateBookInfo(@PathVariable("bookId") Long bookId, @RequestBody Book newBook) {
-        if (newBook.getTitle() == null || newBook.getAuthor() == null || newBook.getDescription() == null)
+        if (newBook.getTitle() == null || newBook.getAuthor() == null || newBook.getDescription() == null) {
             return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-
-        Optional<Book> updatedBook = bookService.updateBookInfo(bookId, newBook);
-        if (updatedBook.isPresent())
-            return new ResponseEntity<>(HttpStatus.OK);
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        bookService.updateBookInfo(bookId, newBook);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**
@@ -73,10 +71,8 @@ public class BookController {
      */
     @DeleteMapping("/{bookId}")
     public ResponseEntity<Object> deleteBook(@PathVariable("bookId") Long bookId) {
-        boolean deleted = bookService.deleteBook(bookId);
-        if (deleted)
-            return new ResponseEntity<>(HttpStatus.OK);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        bookService.deleteBook(bookId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**
