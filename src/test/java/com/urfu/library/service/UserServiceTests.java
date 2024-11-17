@@ -1,0 +1,132 @@
+package com.urfu.library.service;
+
+import com.urfu.library.model.Role;
+import com.urfu.library.model.User;
+import com.urfu.library.model.repository.UserRepository;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
+
+/**
+ * Тесты методов сервиса для работы с сущностью User
+ * @author Alexandr FIlatov
+ */
+public class UserServiceTests {
+    @Mock
+    UserRepository userRepository;
+    @Mock
+    PasswordEncoder passwordEncoder;
+    @InjectMocks
+    UserService userService;
+
+    private User user;
+
+    private User admin;
+
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        user = new User(1L,"Vanya","123@gmail.com",
+                passwordEncoder.encode("qwerty"), Role.ROLE_USER);
+        admin = new User(1L,"Petya","1234@gmail.com",
+                passwordEncoder.encode("qwerty"), Role.ROLE_ADMIN);
+    }
+
+    /**
+     * Тестирует успешное создание нового пользователя в системе
+     * @author Alexandr FIlatov
+     */
+    @Test
+    public void createUser_Success() {
+        Mockito.when(userRepository.findById(user.getId())).thenReturn(Optional.ofNullable(user));
+        boolean flag = userService.createUser(user);
+        Optional<User> createdUser = userRepository.findById(user.getId());
+
+        Assertions.assertTrue(flag);
+        Assertions.assertTrue(createdUser.isPresent());
+        Assertions.assertEquals(user, createdUser.get());
+    }
+
+    /**
+     * Тестирует безуспешное создание пользователя в системе,
+     * т.к. пользователь с таким логином уже зарегистрирован
+     * @author Alexandr FIlatov
+     */
+    @Test
+    public void createUser_Failure() {
+        Mockito.when(userRepository.findByUsername(user.getUsername())).thenReturn(user);
+        userService.createUser(user);
+        boolean flag = userService.createUser(user);
+        Optional<User> createdUser = userRepository.findById(user.getId());
+
+        Assertions.assertFalse(flag);
+        Assertions.assertFalse(createdUser.isPresent());
+    }
+
+    /**
+     * Тестирует успешное создание пользователя-админа в системе
+     * @author Alexandr FIlatov
+     */
+    @Test
+    public void createAdmin(){
+        Mockito.when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        boolean flag = userService.createAdmin(admin);
+        Optional<User> createdAdmin = userRepository.findById(admin.getId());
+
+        Assertions.assertTrue(flag);
+        Assertions.assertTrue(createdAdmin.isPresent());
+        Assertions.assertEquals(user, createdAdmin.get());
+    }
+
+    /**
+     * Тестирует безуспешное создание пользователя-админа в системе,
+     * т.к. пользователь с таким логином уже зарегистрирован
+     * @author Alexandr FIlatov
+     */
+    @Test
+    public void createAdmin_Failure() {
+        Mockito.when(userRepository.findByUsername(admin.getUsername())).thenReturn(admin);
+        userService.createAdmin(admin);
+        boolean flag = userService.createAdmin(admin);
+        Optional<User> createdAdmin = userRepository.findById(admin.getId());
+
+        Assertions.assertFalse(flag);
+        Assertions.assertFalse(createdAdmin.isPresent());
+    }
+
+    /**
+     * Тестирует успешное получение пользователя по логину
+     * @author Alexandr FIlatov
+     */
+    @Test
+    public void loadUserByUsername_Success() {
+        Mockito.when(userRepository.findByUsername(user.getUsername())).thenReturn(user);
+        UserDetails foundUser = userService.loadUserByUsername(user.getUsername());
+
+        Assertions.assertEquals(user, foundUser);
+    }
+
+    /**
+     * Тестирует безуспешное получение пользователя по логину, т.к. его нет в системе
+     * @author Alexandr FIlatov
+     */
+    @Test
+    public void loadUserByUsername_Failure() {
+        Mockito.when(userRepository.findByUsername(user.getUsername())).thenReturn(null);
+
+        UsernameNotFoundException exception = Assertions.assertThrows(UsernameNotFoundException.class,
+                () -> {userService.loadUserByUsername(user.getUsername());});
+        Assertions.assertEquals(exception.getMessage(), "Username not found: Vanya");
+    }
+}

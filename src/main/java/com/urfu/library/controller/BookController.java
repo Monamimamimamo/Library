@@ -33,6 +33,7 @@ public class BookController {
      * @return ResponseEntity со списком книг и статусом HTTP.
      * HttpStatus: OK, в случае успеха.
      * HttpStatus: NO_CONTENT, в случае отсутствия книг в БД.
+     * HttpStatus: UNAUTHORIZED, в случае, если пользователь не авторизовался.
      */
     @GetMapping("/all")
     public ResponseEntity<List<Book>> getAllBooks() {
@@ -51,6 +52,8 @@ public class BookController {
      * HttpStatus: OK, в случае успеха.
      * HttpStatus: NO_CONTENT, в случае отсутствия искомой книги в БД.
      * HttpStatus: UNPROCESSABLE_ENTITY, в случае некорректности входных данных для книги.
+     * HttpStatus: UNAUTHORIZED, в случае, если пользователь не авторизовался.
+     * HttpStatus: FORBIDDEN, в случае, если пользователь не является Админом.
      */
     @PutMapping("/{bookId}")
     public ResponseEntity<Object> updateBookInfo(@PathVariable("bookId") Long bookId, @RequestBody Book newBook) {
@@ -67,7 +70,9 @@ public class BookController {
      * @param bookId уникальный идентификатор книги
      * @return ResponseEntity с соответствующим статусом HTTP
      * HttpStatus: OK, в случае успеха.
-     * HttpStatus: NO_CONTENT, в случае отсутствия искомой книги в БД.Ъ
+     * HttpStatus: NO_CONTENT, в случае отсутствия искомой книги в БД.
+     * HttpStatus: UNAUTHORIZED, в случае, если пользователь не авторизовался.
+     * HttpStatus: FORBIDDEN, в случае, если пользователь не является Админом.
      */
     @DeleteMapping("/{bookId}")
     public ResponseEntity<Object> deleteBook(@PathVariable("bookId") Long bookId) {
@@ -82,6 +87,8 @@ public class BookController {
      * <ul>
      *     <li>201 Created</li>
      *     <li>422 Unprocessable Entity</li>
+     *     <li>401 UNAUTHORIZED</li>
+     *     <li>403 Forbidden</li>
      * </ul>
      * @author Alexandr Filatov
      */
@@ -98,6 +105,7 @@ public class BookController {
      * <ul>
      *     <li>200 Success</li>
      *     <li>404 Not Found</li>
+     *     <li>401 UNAUTHORIZED</li>
      * </ul>
      * @author Alexandr Filatov
      */
@@ -117,6 +125,7 @@ public class BookController {
      * <ul>
      *     <li>200 Success</li>
      *     <li>404 Not Found</li>
+     *     <li>401 UNAUTHORIZED</li>
      * </ul>
      * @author Alexandr Filatov
      */

@@ -1,7 +1,7 @@
 package com.urfu.library.service;
 
 import com.urfu.library.model.Book;
-import com.urfu.library.model.BookRepository;
+import com.urfu.library.model.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

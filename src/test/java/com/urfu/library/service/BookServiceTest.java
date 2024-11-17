@@ -1,7 +1,7 @@
 package com.urfu.library.service;
 
 import com.urfu.library.model.Book;
-import com.urfu.library.model.BookRepository;
+import com.urfu.library.model.repository.BookRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ public class BookServiceTest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         bookId = 1L;
-        book = new Book("Test Title", "Test Author", "Test Description");
+        book = new Book("Test Title", "Test Author", "Test Description", false);
     }
 
     /**
@@ -68,7 +68,7 @@ public class BookServiceTest {
      */
     @Test
     public void testUpdateBookInfo_Success() {
-        Book newBookData = new Book("Updated Title", "Updated Author", "Updated Description");
+        Book newBookData = new Book("Updated Title", "Updated Author", "Updated Description", false);
 
         Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         Optional<Book> updatedBook = bookService.updateBookInfo(bookId, newBookData);
