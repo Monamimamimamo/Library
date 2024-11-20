@@ -30,8 +30,11 @@ public class UserControllerTests {
     private MockMvc mockMvc;
 
     private User user;
-    private User admin;
 
+    /**
+     * Настройка перед каждым тестом, инициализация mockMvc,
+     * получение кодировщика паролей и создание тестового пользователя
+     */
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -40,8 +43,6 @@ public class UserControllerTests {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         user = new User(1L,"Vanya","123@gmail.com",
                 passwordEncoder.encode("qwerty"), Role.ROLE_USER);
-        admin = new User(2L,"Petya","1234@gmail.com",
-                passwordEncoder.encode("qwerty"), Role.ROLE_ADMIN);
     }
 
     /**

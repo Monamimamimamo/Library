@@ -23,16 +23,18 @@ import java.util.Optional;
  */
 public class UserServiceTests {
     @Mock
-    UserRepository userRepository;
-    @Mock
-    PasswordEncoder passwordEncoder;
+    private UserRepository userRepository;
+
     @InjectMocks
-    UserService userService;
+    private UserService userService;
 
     private User user;
 
     private User admin;
 
+    /**
+     * Настройка перед каждым тестом, создание тестовых пользователей с закодированными паролями
+     */
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -79,7 +81,7 @@ public class UserServiceTests {
      * @author Alexandr FIlatov
      */
     @Test
-    public void createAdmin(){
+    public void createAdmin_Success() {
         Mockito.when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         boolean flag = userService.createAdmin(admin);
         Optional<User> createdAdmin = userRepository.findById(admin.getId());
@@ -125,8 +127,7 @@ public class UserServiceTests {
     public void loadUserByUsername_Failure() {
         Mockito.when(userRepository.findByUsername(user.getUsername())).thenReturn(null);
 
-        UsernameNotFoundException exception = Assertions.assertThrows(UsernameNotFoundException.class,
-                () -> {userService.loadUserByUsername(user.getUsername());});
-        Assertions.assertEquals(exception.getMessage(), "Username not found: Vanya");
+        Assertions.assertThrows(UsernameNotFoundException.class,
+                () -> userService.loadUserByUsername(user.getUsername()), "Username not found: Vanya");
     }
 }

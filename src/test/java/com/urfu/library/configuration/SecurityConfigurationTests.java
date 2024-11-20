@@ -41,6 +41,9 @@ public class SecurityConfigurationTests {
     @Autowired
     private UserService userService;
 
+    /**
+     * Настройка перед каждым сервисом, очистка тестовой БД и инициализация mockMvc
+     */
     @BeforeEach
     public void setup() {
         userRepository.deleteAll();
