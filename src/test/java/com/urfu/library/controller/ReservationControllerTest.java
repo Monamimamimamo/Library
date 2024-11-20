@@ -1,6 +1,5 @@
 package com.urfu.library.controller;
 
-import com.urfu.library.model.Book;
 import com.urfu.library.model.Reservation;
 import com.urfu.library.model.Role;
 import com.urfu.library.model.User;
@@ -38,8 +37,16 @@ class ReservationControllerTest {
     private List<Reservation> reservations;
     private Reservation reservation;
 
+    /**
+     * Метод инициализации для каждого теста.,
+     * Настраивает MockMvc для тестирования контроллера,
+     * создаёт тестовый пустой список для бронирований,
+     * создаёт тестовый экземпляр бронирования,
+     * задаёт Id для книги,
+     * созадаёт тестовый экземпляр пользователя.
+     */
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(reservationController).build();
 

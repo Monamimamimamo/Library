@@ -29,6 +29,11 @@ public class BookControllerTest {
     private Long bookId;
     private Book book;
 
+
+    /**
+     * Метод инициализации для каждого теста.
+     * Создаёт тестовый экземпляр книги и настраивает MockMvc для тестирования контроллера.
+     */
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
