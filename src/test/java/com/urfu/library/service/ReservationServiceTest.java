@@ -19,7 +19,7 @@ import java.util.Optional;
 /**
  * Класс реализует модульные тесты для сервиса бронирований
  */
-class ReservationServiceTest {
+public class ReservationServiceTest {
 
     @Mock
     private ReservationRepository reservationRepository;
@@ -33,8 +33,12 @@ class ReservationServiceTest {
     private Reservation reservation;
     private Book book;
 
+    /**
+     * Метод инициализации для каждого теста.
+     * Создаёт тестовые экземпляры книги и бронирования.
+     */
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
 
         book = new Book();

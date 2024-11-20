@@ -23,6 +23,10 @@ public class BookServiceTest {
     private Book book;
     private Long bookId;
 
+    /**
+     * Метод инициализации для каждого теста.
+     * Создаёт тестовый экземпляр книги.
+     */
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);

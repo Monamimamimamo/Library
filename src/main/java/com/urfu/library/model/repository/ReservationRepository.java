@@ -17,7 +17,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findByIsReturned(boolean isReturned);
 
     /**
-     * По аналогии с findByIsReturned, но для конкретного пользователя
+     * Для конкретного пользователя.
+     * Поиск всех завершенных бронирований, если передан true,
+     * иначе ищутся все незавершенные бронирования
      */
     List<Reservation> findByUserIdAndIsReturned(Long userId, boolean isReturned);
 

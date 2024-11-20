@@ -31,7 +31,7 @@ public class ReservationService {
      * Каждый день в определённое время проверяет вышли ли невозвращённые книги за дедлайн.
      * В случае пропуска дедлайна, статус дедлайна бронирования меняется на true.
      */
-    @Scheduled(cron = "0 55 11 * * *")  // Срабатывает в 11.55 каждый день
+    @Scheduled(cron = "${deadline.status.update.cron}")
     public void updateMissedDeadlines() {
         LocalDateTime now = LocalDateTime.now();
 
