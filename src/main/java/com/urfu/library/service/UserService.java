@@ -1,5 +1,6 @@
 package com.urfu.library.service;
 
+import com.urfu.library.controller.dto.UserRequestDto;
 import com.urfu.library.model.Role;
 import com.urfu.library.model.User;
 import com.urfu.library.model.repository.UserRepository;
@@ -31,13 +32,13 @@ public class UserService implements UserDetailsService {
      * Создание нового пользователя в системе
      * @author Alexandr FIlatov
      */
-    public boolean createUser(User user) {
+    public boolean createUser(UserRequestDto userRequestDto) {
+        User user = new User(userRequestDto.username(), userRequestDto.email(),
+                encoder.encode(userRequestDto.password()), Role.ROLE_USER);
         User loadedUser = repository.findByUsername(user.getUsername());
         if (loadedUser != null) {
             return false;
         }
-        user.setRole(Role.ROLE_USER);
-        user.setPassword(encoder.encode(user.getPassword()));
         repository.save(user);
         return true;
     }
@@ -46,13 +47,13 @@ public class UserService implements UserDetailsService {
      * Создание аккаунта для администратора
      * @author Alexandr FIlatov
      */
-    public boolean createAdmin(User user) {
+    public boolean createAdmin(UserRequestDto userRequestDto) {
+        User user = new User(userRequestDto.username(), userRequestDto.email(),
+                encoder.encode(userRequestDto.password()), Role.ROLE_ADMIN);
         User loadedUser = repository.findByUsername(user.getUsername());
         if (loadedUser != null) {
             return false;
         }
-        user.setRole(Role.ROLE_ADMIN);
-        user.setPassword(encoder.encode(user.getPassword()));
         repository.save(user);
         return true;
     }

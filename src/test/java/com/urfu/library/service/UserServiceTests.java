@@ -1,5 +1,6 @@
 package com.urfu.library.service;
 
+import com.urfu.library.controller.dto.UserRequestDto;
 import com.urfu.library.model.Role;
 import com.urfu.library.model.User;
 import com.urfu.library.model.repository.UserRepository;
@@ -24,6 +25,8 @@ import java.util.Optional;
 public class UserServiceTests {
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserService userService;
@@ -32,6 +35,9 @@ public class UserServiceTests {
 
     private User admin;
 
+    private UserRequestDto userRequestDto;
+
+    private UserRequestDto adminRequestDto;
     /**
      * Настройка перед каждым тестом, создание тестовых пользователей с закодированными паролями
      */
@@ -39,6 +45,8 @@ public class UserServiceTests {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        userRequestDto = new UserRequestDto("Vanya", "123@gmai.com", "qwerty");
+        adminRequestDto = new UserRequestDto("Petya", "1234@gmail.com", "qwerty");
         user = new User(1L,"Vanya","123@gmail.com",
                 passwordEncoder.encode("qwerty"), Role.ROLE_USER);
         admin = new User(1L,"Petya","1234@gmail.com",
@@ -52,7 +60,7 @@ public class UserServiceTests {
     @Test
     public void createUser_Success() {
         Mockito.when(userRepository.findById(user.getId())).thenReturn(Optional.ofNullable(user));
-        boolean flag = userService.createUser(user);
+        boolean flag = userService.createUser(userRequestDto);
         Optional<User> createdUser = userRepository.findById(user.getId());
 
         Assertions.assertTrue(flag);
@@ -68,8 +76,8 @@ public class UserServiceTests {
     @Test
     public void createUser_Failure() {
         Mockito.when(userRepository.findByUsername(user.getUsername())).thenReturn(user);
-        userService.createUser(user);
-        boolean flag = userService.createUser(user);
+        userService.createUser(userRequestDto);
+        boolean flag = userService.createUser(userRequestDto);
         Optional<User> createdUser = userRepository.findById(user.getId());
 
         Assertions.assertFalse(flag);
@@ -83,7 +91,7 @@ public class UserServiceTests {
     @Test
     public void createAdmin_Success() {
         Mockito.when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        boolean flag = userService.createAdmin(admin);
+        boolean flag = userService.createAdmin(userRequestDto);
         Optional<User> createdAdmin = userRepository.findById(admin.getId());
 
         Assertions.assertTrue(flag);
@@ -99,8 +107,8 @@ public class UserServiceTests {
     @Test
     public void createAdmin_Failure() {
         Mockito.when(userRepository.findByUsername(admin.getUsername())).thenReturn(admin);
-        userService.createAdmin(admin);
-        boolean flag = userService.createAdmin(admin);
+        userService.createAdmin(adminRequestDto);
+        boolean flag = userService.createAdmin(adminRequestDto);
         Optional<User> createdAdmin = userRepository.findById(admin.getId());
 
         Assertions.assertFalse(flag);
@@ -127,7 +135,8 @@ public class UserServiceTests {
     public void loadUserByUsername_Failure() {
         Mockito.when(userRepository.findByUsername(user.getUsername())).thenReturn(null);
 
-        Assertions.assertThrows(UsernameNotFoundException.class,
-                () -> userService.loadUserByUsername(user.getUsername()), "Username not found: Vanya");
+        UsernameNotFoundException exception = Assertions.assertThrows(UsernameNotFoundException.class,
+                () -> userService.loadUserByUsername(user.getUsername()));
+        Assertions.assertEquals("Username not found: Vanya", exception.getMessage());
     }
 }
