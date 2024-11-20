@@ -38,8 +38,7 @@ public class UserController {
      */
     @PostMapping("/signup")
     public ResponseEntity<String> createUser(@RequestBody @Valid UserRequestDto userDto) {
-        User user = new User(userDto.username(), userDto.email(), userDto.password());
-        if(!userService.createUser(user)) {
+        if(!userService.createUser(userDto)) {
             return new ResponseEntity<>("Username already taken", HttpStatus.UNPROCESSABLE_ENTITY);
         }
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -54,8 +53,7 @@ public class UserController {
      */
     @PostMapping("/admin/signup")
     public ResponseEntity<String> createAdminUser(@RequestBody @Valid UserRequestDto userDto) {
-        User user = new User(userDto.username(), userDto.email(), userDto.password());
-        if(!userService.createAdmin(user)) {
+        if(!userService.createAdmin(userDto)) {
             return new ResponseEntity<>("Username already taken", HttpStatus.UNPROCESSABLE_ENTITY);
         }
         return new ResponseEntity<>(HttpStatus.CREATED);

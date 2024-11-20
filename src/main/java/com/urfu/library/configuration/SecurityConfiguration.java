@@ -23,11 +23,11 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 public class SecurityConfiguration {
 
     /**
-     * Получить кодировщик паролей
+     * Создает кодировщик паролей
      * @author Alexandr FIlatov
      */
     @Bean
-    public PasswordEncoder getPasswordEncoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 

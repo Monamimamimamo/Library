@@ -1,7 +1,7 @@
 package com.urfu.library.configuration;
 
+import com.urfu.library.controller.dto.UserRequestDto;
 import com.urfu.library.model.Book;
-import com.urfu.library.model.User;
 import com.urfu.library.model.repository.BookRepository;
 import com.urfu.library.model.repository.UserRepository;
 import com.urfu.library.service.UserService;
@@ -203,7 +203,7 @@ public class SecurityConfigurationTests {
      */
     @Test
     public void signIn_Success() throws Exception {
-        User user = new User("alex", "123@gmail.com", "qwerty");
+        UserRequestDto user = new UserRequestDto("alex", "123@gmail.com", "qwerty");
         userService.createUser(user);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/signIn?username=alex&password=qwerty"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -214,7 +214,7 @@ public class SecurityConfigurationTests {
      */
     @Test
     public void signIn_Failure() throws Exception {
-        User user = new User("alex", "123@gmail.com", "12345");
+        UserRequestDto user = new UserRequestDto("alex", "123@gmail.com", "12345");
         userService.createUser(user);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/signIn?username=alex&password=qwerty"))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized());

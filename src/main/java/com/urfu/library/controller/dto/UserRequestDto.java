@@ -3,7 +3,7 @@ package com.urfu.library.controller.dto;
 import jakarta.validation.constraints.NotBlank;
 
 /**
- * Dto для сущности User
+ * Dto запросов для сущности User
  * @param username - имя пользователя
  * @param email - почта пользователя
  * @param password - пароль пользователя
