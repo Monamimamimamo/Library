@@ -32,8 +32,8 @@ public class UserService implements UserDetailsService {
      * @author Alexandr FIlatov
      */
     public boolean createUser(User user) {
-        User checkUser = repository.findByUsername(user.getUsername());
-        if (checkUser != null) {
+        User loadedUser = repository.findByUsername(user.getUsername());
+        if (loadedUser != null) {
             return false;
         }
         user.setRole(Role.ROLE_USER);
@@ -47,8 +47,8 @@ public class UserService implements UserDetailsService {
      * @author Alexandr FIlatov
      */
     public boolean createAdmin(User user) {
-        User checkUser = repository.findByUsername(user.getUsername());
-        if (checkUser != null) {
+        User loadedUser = repository.findByUsername(user.getUsername());
+        if (loadedUser != null) {
             return false;
         }
         user.setRole(Role.ROLE_ADMIN);

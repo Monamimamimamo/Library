@@ -88,7 +88,8 @@ public class BookServiceTest {
     public void testUpdateBookInfo_BookNotFound() {
         Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> bookService.updateBookInfo(bookId, book), "Book to update not found");
+        Assertions.assertThrows(NoSuchElementException.class,
+                () -> bookService.updateBookInfo(bookId, book), "Book to update not found");
         Mockito.verify(bookRepository, Mockito.never()).save(ArgumentMatchers.any(Book.class));
     }
 
@@ -115,7 +116,8 @@ public class BookServiceTest {
     public void testDeleteBook_BookNotFound() {
         Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> bookService.deleteBook(bookId), "Book to delete not found");
+        Assertions.assertThrows(NoSuchElementException.class,
+                () -> bookService.deleteBook(bookId), "Book to delete not found");
         Mockito.verify(bookRepository, Mockito.never()).deleteById(ArgumentMatchers.any(Long.class));
     }
 
