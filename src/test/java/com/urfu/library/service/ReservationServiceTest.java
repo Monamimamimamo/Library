@@ -25,6 +25,9 @@ public class ReservationServiceTest {
     private ReservationRepository reservationRepository;
 
     @Mock
+    private MailerService mailerService;
+
+    @Mock
     private BookRepository bookRepository;
 
     @InjectMocks
@@ -49,6 +52,7 @@ public class ReservationServiceTest {
         reservation.setBookId(1L);
         reservation.setUserId(10L);
         reservation.setReturned(false);
+        reservation.setDeadlineMissed(false);
         reservation.setFinishDate(LocalDateTime.now().plusDays(1));
     }
 
@@ -104,6 +108,7 @@ public class ReservationServiceTest {
      * Тестирует успешное возвращение книги в библиотеку.
      * Когда книга успешно возвращена, её статус в бронировании обновляется,
      * а книга помечается как доступная для бронирования.
+     * Проверяем, что mailerService отправил уведомление.
      */
     @Test
     void testReturnBook_Success() {
@@ -118,11 +123,13 @@ public class ReservationServiceTest {
 
         Mockito.verify(reservationRepository, Mockito.times(1)).save(reservation);
         Mockito.verify(bookRepository, Mockito.times(1)).save(book);
+        Mockito.verify(mailerService, Mockito.times(1)).notifyReturned(reservation);
     }
 
     /**
      * Тестирует сценарий, когда нет активного бронирования для указанной книги.
      * В этом случае метод returnBook возвращает false, так как возврат невозможен.
+     * Проверяем, что mailerService отправил уведомление.
      */
     @Test
     void testReturnBook_NoReservation() {
@@ -131,6 +138,9 @@ public class ReservationServiceTest {
         boolean result = reservationService.returnBook(1L);
 
         Assertions.assertFalse(result);
+        Mockito.verify(reservationRepository, Mockito.never()).save(Mockito.any(Reservation.class));
+        Mockito.verify(bookRepository, Mockito.never()).save(Mockito.any(Book.class));
+        Mockito.verify(mailerService, Mockito.never()).notifyReturned(Mockito.any(Reservation.class));
     }
 
     /**
@@ -166,24 +176,57 @@ public class ReservationServiceTest {
 
     /**
      * Тестирует выполнение задачи для обновления статуса дедлайнов для книг, которые не были возвращены в срок.
+     * Проверяем, что mailerService вызвал метод о пропуске дедлайна.
      * В случае пропуска дедлайна, статус isDeadlineMissed изменяется на true.
      * В первый раз статус не должен меняться, из-за чего мы ожидаем save() 1 раз.
      */
     @Test
     void testUpdateMissedDeadlines() {
-        reservation.setFinishDate(LocalDateTime.now().plusDays(1));
         Mockito.when(reservationRepository.findByIsReturned(false)).thenReturn(List.of(reservation));
-        reservationService.updateMissedDeadlines();
-
-        Assertions.assertFalse(reservation.isDeadlineMissed());
-
         reservation.setFinishDate(LocalDateTime.now().minusDays(1));
-        Mockito.when(reservationRepository.findByIsReturned(false)).thenReturn(List.of(reservation));
+
         reservationService.updateMissedDeadlines();
 
+        Mockito.verify(mailerService, Mockito.times(1)).notifyDeadlineExpired(reservation);
         Assertions.assertTrue(reservation.isDeadlineMissed());
-
         Mockito.verify(reservationRepository, Mockito.times(1)).save(reservation);
     }
 
+
+    /**
+     * Проверяет логику, если до дедлайна осталось 3 дня
+     * Проверяем, что статус isDeadlineMissed не изменился.
+     * Проверяем, что mailerService вызвал метод о предстоящем дедлайне.
+     * Проверяем, что save() не вызывался.
+     */
+    @Test
+    void testNotifyAboutDeadline() {
+        Mockito.when(reservationRepository.findByIsReturned(false)).thenReturn(List.of(reservation));
+        reservation.setFinishDate(LocalDateTime.now().plusDays(3));
+
+        reservationService.updateMissedDeadlines();
+
+        Assertions.assertFalse(reservation.isDeadlineMissed());
+        Mockito.verify(mailerService, Mockito.times(1)).notifyDeadline(reservation, 3);
+        Mockito.verify(reservationRepository, Mockito.never()).save(Mockito.any(Reservation.class));
+    }
+
+    /**
+     * Проверяет логику, если до дедлайна осталось 10 дней.
+     * Проверяем, что статус isDeadlineMissed не изменился.
+     * Проверяем, что mailerService не вызывал notifyDeadline.
+     * Проверяем, что save() не вызывался.
+     */
+    @Test
+    void testNotifyDeadlineExpired() {
+        Mockito.when(reservationRepository.findByIsReturned(false)).thenReturn(List.of(reservation));
+
+        reservation.setFinishDate(LocalDateTime.now().plusDays(10));
+
+        reservationService.updateMissedDeadlines();
+
+        Assertions.assertFalse(reservation.isDeadlineMissed());
+        Mockito.verify(mailerService, Mockito.never()).notifyDeadline(Mockito.any(Reservation.class), Mockito.anyLong());
+        Mockito.verify(mailerService, Mockito.never()).notifyDeadlineExpired(Mockito.any(Reservation.class));
+    }
 }
