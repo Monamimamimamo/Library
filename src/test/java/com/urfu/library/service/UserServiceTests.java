@@ -1,6 +1,6 @@
 package com.urfu.library.service;
 
-import com.urfu.library.controller.dto.UserRequestDto;
+import com.urfu.library.model.dto.UserRequestDto;
 import com.urfu.library.model.Role;
 import com.urfu.library.model.User;
 import com.urfu.library.model.repository.UserRepository;

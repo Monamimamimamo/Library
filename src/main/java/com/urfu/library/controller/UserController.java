@@ -1,7 +1,6 @@
 package com.urfu.library.controller;
 
-import com.urfu.library.controller.dto.UserRequestDto;
-import com.urfu.library.model.User;
+import com.urfu.library.model.dto.UserRequestDto;
 import com.urfu.library.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.net.http.HttpRequest;
 
 /**
  * Контроллер для обработки запросов связанных сущностью User
