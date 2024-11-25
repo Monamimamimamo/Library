@@ -1,6 +1,6 @@
 package com.urfu.library.configuration;
 
-import com.urfu.library.controller.dto.UserRequestDto;
+import com.urfu.library.model.dto.UserRequestDto;
 import com.urfu.library.model.Book;
 import com.urfu.library.model.repository.BookRepository;
 import com.urfu.library.model.repository.UserRepository;

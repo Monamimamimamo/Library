@@ -1,4 +1,4 @@
-package com.urfu.library.controller.dto;
+package com.urfu.library.model.dto;
 
 import jakarta.validation.constraints.NotBlank;
 

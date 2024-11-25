@@ -1,14 +1,12 @@
 package com.urfu.library.controller;
 
 import com.urfu.library.controller.advice.BookControllerAdvice;
-import com.urfu.library.controller.dto.UserRequestDto;
+import com.urfu.library.model.dto.UserRequestDto;
 import com.urfu.library.service.UserService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -77,9 +75,45 @@ public class UserControllerTests {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/signup").contentType(MediaType.APPLICATION_JSON)
                         .content("{ \"username\": \"Vanya\", \"password\": \"qwerty\", \"email\": \"123@gmail.com\" }"))
                 .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity());
+    }
 
-        UserDetails createdUser = userService.loadUserByUsername(user.username());
+    /**
+     * Тест успешного создания нового администратора в системе
+     * @author Alexandr FIlatov
+     */
+    @Test
+    public void testCreateAdmin_Success() throws Exception {
+        Mockito.when(userService.createAdmin(Mockito.any(UserRequestDto.class))).thenReturn(true);
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/signup").contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"username\": \"Vanya\", \"password\": \"qwerty\", \"email\": \"123@gmail.com\" }"))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
 
-        Assertions.assertNull(createdUser);
+        Mockito.verify(userService, Mockito.times(1)).createAdmin(user);
+    }
+
+    /**
+     * Тест безуспешного создания нового администратора в системе при вводе невалидных данных
+     * @author Alexandr FIlatov
+     */
+    @Test
+    public void testCreateAdmin_UnprocessableEntity() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/signup").contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"username\": \"\", \"password\": \"qwerty\", \"email\": \"123@gmail.com\" }"))
+                .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity());
+
+        Mockito.verify(userService, Mockito.never()).createAdmin(ArgumentMatchers.any(UserRequestDto.class));
+    }
+
+    /**
+     * Тестирует безуспешное добавление нового администратора в систему в случае,
+     * если указанный логин уже содержится в базе данных
+     * @author Alexandr FIlatov
+     */
+    @Test
+    public void testCreateAdmin_AlreadyExist() throws Exception {
+        Mockito.when(userService.createAdmin(Mockito.any(UserRequestDto.class))).thenReturn(false);
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/signup").contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"username\": \"Vanya\", \"password\": \"qwerty\", \"email\": \"123@gmail.com\" }"))
+                .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity());
     }
 }
