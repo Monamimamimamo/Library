@@ -30,19 +30,6 @@ public class Reservation {
     private LocalDateTime finishDate;
 
     /**
-     * Конструктор с явным указанием всех значений для полей сущности
-     */
-    public Reservation(Long id, Long bookId, Long userId, boolean isReturned, boolean isDeadlineMissed, LocalDateTime startDate, LocalDateTime finishDate) {
-        this.id = id;
-        this.bookId = bookId;
-        this.userId = userId;
-        this.isReturned = isReturned;
-        this.isDeadlineMissed = isDeadlineMissed;
-        this.startDate = startDate;
-        this.finishDate = finishDate;
-    }
-
-    /**
      * Конструктор с указанием значений для всех полей, кроме ID - генерируется автоматически
      */
     public Reservation(Long bookId, Long userId, boolean isReturned, boolean isDeadlineMissed, LocalDateTime startDate, LocalDateTime finishDate) {
@@ -101,16 +88,15 @@ public class Reservation {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Reservation that = (Reservation) o;
-        return Objects.equals(id, that.id)
-                && Objects.equals(bookId, that.bookId)
-                && Objects.equals(userId, that.userId);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, bookId, userId);
+        return Objects.hash(id);
     }
 
     public boolean isReturned() {
