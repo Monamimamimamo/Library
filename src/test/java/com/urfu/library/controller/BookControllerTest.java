@@ -1,11 +1,13 @@
 package com.urfu.library.controller;
 
-import com.urfu.library.controller.advice.BookControllerAdvice;
+import com.urfu.library.controller.advice.RestControllerAdvice;
 import com.urfu.library.model.Book;
 import com.urfu.library.service.BookService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -17,6 +19,7 @@ import java.util.*;
 /**
  * Класс реализует модульные тесты для контроллера книг
  */
+@ExtendWith(MockitoExtension.class)
 public class BookControllerTest {
 
     @Mock
@@ -29,15 +32,13 @@ public class BookControllerTest {
     private Long bookId;
     private Book book;
 
-
     /**
      * Метод инициализации для каждого теста.
      * Создаёт тестовый экземпляр книги и настраивает MockMvc для тестирования контроллера.
      */
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(bookController).setControllerAdvice(BookControllerAdvice.class).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(bookController).setControllerAdvice(RestControllerAdvice.class).build();
 
         bookId = 1L;
         book = new Book("Test Title", "Test Author", "Test Description", false);

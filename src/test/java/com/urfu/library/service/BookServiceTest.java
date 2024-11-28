@@ -5,13 +5,16 @@ import com.urfu.library.model.repository.BookRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
 
 /**
  * Класс реализует модульные тесты для сервиса книг
  */
+@ExtendWith(MockitoExtension.class)
 public class BookServiceTest {
 
     @Mock
@@ -29,7 +32,6 @@ public class BookServiceTest {
      */
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
         bookId = 1L;
         book = new Book("Test Title", "Test Author", "Test Description", false);
     }
