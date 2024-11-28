@@ -81,11 +81,13 @@ public class ReservationService {
                 reservation.setReturned(true);
                 reservationRepository.save(reservation);
 
-                Book book = bookRepository.getById(reservation.getBookId());
-                book.setReserved(false);
-                bookRepository.save(book);
-
-                return true;
+                Optional<Book> optionalBook = bookRepository.findById(reservation.getBookId());
+                if (optionalBook.isPresent()) {
+                    Book book = optionalBook.get();
+                    book.setReserved(false);
+                    bookRepository.save(book);
+                    return true;
+                }
             }
         }
         return false;

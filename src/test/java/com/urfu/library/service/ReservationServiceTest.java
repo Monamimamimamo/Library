@@ -7,10 +7,11 @@ import com.urfu.library.model.repository.ReservationRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Optional;
 /**
  * Класс реализует модульные тесты для сервиса бронирований
  */
+@ExtendWith(MockitoExtension.class)
 public class ReservationServiceTest {
 
     @Mock
@@ -39,8 +41,6 @@ public class ReservationServiceTest {
      */
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
-
         book = new Book();
         book.setId(1L);
         book.setReserved(false);
@@ -59,8 +59,10 @@ public class ReservationServiceTest {
      */
     @Test
     void testReserveBook_Success() {
-        Mockito.when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
-        Mockito.when(reservationRepository.save(Mockito.any(Reservation.class))).thenReturn(reservation);
+        Mockito.when(bookRepository.findById(1L))
+                .thenReturn(Optional.of(book));
+        Mockito.when(reservationRepository.save(Mockito.any(Reservation.class)))
+                .thenReturn(reservation);
 
         Optional<Reservation> result = reservationService.reserveBook(1L, 10L);
 
@@ -107,8 +109,9 @@ public class ReservationServiceTest {
      */
     @Test
     void testReturnBook_Success() {
-        Mockito.when(reservationRepository.findByIsReturnedAndBookId(false, 1L)).thenReturn(Optional.of(reservation));
-        Mockito.when(bookRepository.getById(1L)).thenReturn(book);
+        Mockito.when(reservationRepository.findByIsReturnedAndBookId(false, 1L))
+                .thenReturn(Optional.of(reservation));
+        Mockito.when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
 
         boolean result = reservationService.returnBook(1L);
 
@@ -126,7 +129,8 @@ public class ReservationServiceTest {
      */
     @Test
     void testReturnBook_NoReservation() {
-        Mockito.when(reservationRepository.findByIsReturnedAndBookId(false, 1L)).thenReturn(Optional.empty());
+        Mockito.when(reservationRepository.findByIsReturnedAndBookId(false, 1L))
+                .thenReturn(Optional.empty());
 
         boolean result = reservationService.returnBook(1L);
 
@@ -140,7 +144,8 @@ public class ReservationServiceTest {
      */
     @Test
     void testGetActiveUserReservations() {
-        Mockito.when(reservationRepository.findByUserIdAndIsReturned(10L, false)).thenReturn(List.of(reservation));
+        Mockito.when(reservationRepository.findByUserIdAndIsReturned(10L, false))
+                .thenReturn(List.of(reservation));
 
         var reservations = reservationService.getActiveUserReservations(10L);
 
@@ -155,7 +160,8 @@ public class ReservationServiceTest {
      */
     @Test
     void testGetAllActiveReservations() {
-        Mockito.when(reservationRepository.findByIsReturned(false)).thenReturn(List.of(reservation));
+        Mockito.when(reservationRepository.findByIsReturned(false))
+                .thenReturn(List.of(reservation));
 
         var reservations = reservationService.getAllActiveReservations();
 
@@ -172,13 +178,15 @@ public class ReservationServiceTest {
     @Test
     void testUpdateMissedDeadlines() {
         reservation.setFinishDate(LocalDateTime.now().plusDays(1));
-        Mockito.when(reservationRepository.findByIsReturned(false)).thenReturn(List.of(reservation));
+        Mockito.when(reservationRepository.findByIsReturned(false))
+                .thenReturn(List.of(reservation));
         reservationService.updateMissedDeadlines();
 
         Assertions.assertFalse(reservation.isDeadlineMissed());
 
         reservation.setFinishDate(LocalDateTime.now().minusDays(1));
-        Mockito.when(reservationRepository.findByIsReturned(false)).thenReturn(List.of(reservation));
+        Mockito.when(reservationRepository.findByIsReturned(false))
+                .thenReturn(List.of(reservation));
         reservationService.updateMissedDeadlines();
 
         Assertions.assertTrue(reservation.isDeadlineMissed());
