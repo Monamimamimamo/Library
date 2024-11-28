@@ -59,8 +59,9 @@ public class BookService {
      */
     public void deleteBook(Long bookId) {
         Optional<Book> book = bookRepository.findById(bookId);
-        if (book.isEmpty())
+        if (book.isEmpty()) {
             throw new NoSuchElementException("Book to delete not found");
+        }
         bookRepository.deleteById(bookId);
     }
 

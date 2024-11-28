@@ -1,6 +1,8 @@
 package com.urfu.library.controller;
 
-import com.urfu.library.model.dto.UserRequestDto;
+import com.urfu.library.model.Role;
+import com.urfu.library.model.User;
+import com.urfu.library.controller.dto.UserDto;
 import com.urfu.library.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.naming.NameAlreadyBoundException;
 
 /**
  * Контроллер для обработки запросов связанных сущностью User
@@ -34,10 +38,9 @@ public class UserController {
      * @author Alexandr FIlatov
      */
     @PostMapping("/signup")
-    public ResponseEntity<String> createUser(@RequestBody @Valid UserRequestDto userDto) {
-        if(!userService.createUser(userDto)) {
-            return new ResponseEntity<>("Username already taken", HttpStatus.UNPROCESSABLE_ENTITY);
-        }
+    public ResponseEntity<String> createUser(@RequestBody @Valid UserDto userDto) throws NameAlreadyBoundException {
+        User user = new User(userDto.username(), userDto.email(), userDto.password(), Role.ROLE_USER);
+        userService.createUser(user);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -49,10 +52,9 @@ public class UserController {
      * @author Alexandr FIlatov
      */
     @PostMapping("/admin/signup")
-    public ResponseEntity<String> createAdminUser(@RequestBody @Valid UserRequestDto userDto) {
-        if(!userService.createAdmin(userDto)) {
-            return new ResponseEntity<>("Username already taken", HttpStatus.UNPROCESSABLE_ENTITY);
-        }
+    public ResponseEntity<String> createAdminUser(@RequestBody @Valid UserDto userDto) throws NameAlreadyBoundException {
+        User user = new User(userDto.username(), userDto.email(), userDto.password(), Role.ROLE_ADMIN);
+        userService.createUser(user);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

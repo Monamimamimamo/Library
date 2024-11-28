@@ -1,7 +1,5 @@
 package com.urfu.library.service;
 
-import com.urfu.library.model.dto.UserRequestDto;
-import com.urfu.library.model.Role;
 import com.urfu.library.model.User;
 import com.urfu.library.model.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +8,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import javax.naming.NameAlreadyBoundException;
+import java.util.Optional;
 
 /**
  * Сервис для работы с сущностью User.
@@ -30,44 +31,40 @@ public class UserService implements UserDetailsService {
 
     /**
      * Создание нового пользователя в системе
-     * @author Alexandr FIlatov
+     * @param user пользователь
+     * @return user - созданный пользователь
+     * @throws NameAlreadyBoundException если имя пользователя уже занято
      */
-    public boolean createUser(UserRequestDto userRequestDto) {
-        User user = new User(userRequestDto.username(), userRequestDto.email(),
-                encoder.encode(userRequestDto.password()), Role.ROLE_USER);
-        User loadedUser = repository.findByUsername(user.getUsername());
-        if (loadedUser != null) {
-            return false;
+    public User createUser(User user) throws NameAlreadyBoundException {
+        if (!availableUsernameCheck(user.getUsername())) {
+            throw new NameAlreadyBoundException("Username " + user.getUsername() + " already taken");
         }
-        repository.save(user);
-        return true;
+        user.setPassword(encoder.encode(user.getPassword()));
+        return repository.save(user);
     }
 
     /**
-     * Создание аккаунта для администратора
-     * @author Alexandr FIlatov
+     * Проверяет свободно ли имя пользователя
+     * @param username имя для проверки
+     * @return
+     * <ul>
+     *     <li>true - имя пользователя свободно</li>
+     *     <li>false - имя пользователя занято</li>
+     * </ul>
      */
-    public boolean createAdmin(UserRequestDto userRequestDto) {
-        User user = new User(userRequestDto.username(), userRequestDto.email(),
-                encoder.encode(userRequestDto.password()), Role.ROLE_ADMIN);
-        User loadedUser = repository.findByUsername(user.getUsername());
-        if (loadedUser != null) {
+    public boolean availableUsernameCheck(String username) {
+        if(repository.findByUsername(username).isPresent()) {
             return false;
         }
-        repository.save(user);
         return true;
     }
 
-    /**
-     * Получение пользователя по логину
-     * @author Alexandr FIlatov
-     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = repository.findByUsername(username);
-        if (user == null) {
+        Optional<User> user = repository.findByUsername(username);
+        if (user.isEmpty()) {
             throw new UsernameNotFoundException("Username not found: " + username);
         }
-        return user;
+        return user.get();
     }
 }
