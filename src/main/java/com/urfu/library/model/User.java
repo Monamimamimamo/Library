@@ -43,10 +43,7 @@ public class User implements UserDetails {
      * Конструктор с явным указанием всех параметров, кроме ID - генерируется автоматически
      */
     public User(String username,String email, String password, Role role) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.role = role;
+        this(null, username, email, password, role);
     }
 
     public User() {
