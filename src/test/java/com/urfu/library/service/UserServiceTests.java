@@ -100,13 +100,13 @@ public class UserServiceTests {
      * Тестирует проверку доступности имени пользователя
      */
     @Test
-    public void testAvailableUsernameCheck() {
+    public void testIsUserExist() {
         Mockito.when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.empty());
 
-        Assertions.assertTrue(userService.availableUsernameCheck(user.getUsername()));
+        Assertions.assertTrue(userService.isUserExist(user.getUsername()));
 
         Mockito.when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
 
-        Assertions.assertFalse(userService.availableUsernameCheck(user.getUsername()));
+        Assertions.assertFalse(userService.isUserExist(user.getUsername()));
     }
 }

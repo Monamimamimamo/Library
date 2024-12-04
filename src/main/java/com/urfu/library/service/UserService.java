@@ -36,7 +36,7 @@ public class UserService implements UserDetailsService {
      * @throws NameAlreadyBoundException если имя пользователя уже занято
      */
     public User createUser(User user) throws NameAlreadyBoundException {
-        if (!availableUsernameCheck(user.getUsername())) {
+        if (!isUserExist(user.getUsername())) {
             throw new NameAlreadyBoundException("Username " + user.getUsername() + " already taken");
         }
         user.setPassword(encoder.encode(user.getPassword()));
@@ -52,7 +52,7 @@ public class UserService implements UserDetailsService {
      *     <li>false - имя пользователя занято</li>
      * </ul>
      */
-    public boolean availableUsernameCheck(String username) {
+    public boolean isUserExist(String username) {
         if(repository.findByUsername(username).isPresent()) {
             return false;
         }
