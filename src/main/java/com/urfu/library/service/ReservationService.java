@@ -22,12 +22,14 @@ public class ReservationService {
     private final MailerService mailerService;
     private final ReservationRepository reservationRepository;
     private final BookRepository bookRepository;
+    private final StatisticService statisticService;
 
     @Autowired
-    public ReservationService(MailerService mailerService, ReservationRepository reservationRepository, BookRepository bookRepository) {
+    public ReservationService(MailerService mailerService, ReservationRepository reservationRepository, BookRepository bookRepository, StatisticService statisticService) {
         this.mailerService = mailerService;
         this.reservationRepository = reservationRepository;
         this.bookRepository = bookRepository;
+        this.statisticService = statisticService;
     }
 
     /**
@@ -87,6 +89,7 @@ public class ReservationService {
      * Возвращает false, в случае отсутствия активного бронирования по данной книге, иначе true.
      * Бронирование считается неактивным после возврата книги.
      * Изменяет isReserved книги на false.
+     * Обновляет статистику пользователя.
      * Отправляется сообщение пользователю и администраторам.
      */
     public boolean returnBook(Long bookId) {
@@ -94,10 +97,11 @@ public class ReservationService {
         if (optionalReservation.isPresent()) {
             Reservation reservation = optionalReservation.get();
             if (!reservation.isReturned()) {
+                statisticService.updateStatistic(reservation);
                 reservation.setReturned(true);
                 reservationRepository.save(reservation);
 
-                Book book = bookRepository.getById(reservation.getBookId());
+                Book book = bookRepository.findById(reservation.getBookId()).get();
                 book.setReserved(false);
                 bookRepository.save(book);
                 mailerService.notifyReturned(reservation);

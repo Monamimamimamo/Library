@@ -1,6 +1,8 @@
 package com.urfu.library.service;
 
+import com.urfu.library.model.Statistic;
 import com.urfu.library.model.User;
+import com.urfu.library.model.repository.StatisticRepository;
 import com.urfu.library.model.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.naming.NameAlreadyBoundException;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -20,12 +23,14 @@ import java.util.Optional;
 @Service
 public class UserService implements UserDetailsService {
 
-    private final UserRepository repository;
+    private final UserRepository userRepository;
+    private final StatisticRepository statisticRepository;
     private final PasswordEncoder encoder;
 
     @Autowired
-    public UserService(UserRepository repository, PasswordEncoder encoder) {
-        this.repository = repository;
+    public UserService(UserRepository userRepository, StatisticRepository statisticRepository, PasswordEncoder encoder) {
+        this.userRepository = userRepository;
+        this.statisticRepository = statisticRepository;
         this.encoder = encoder;
     }
 
@@ -39,8 +44,10 @@ public class UserService implements UserDetailsService {
         if (!isUserExist(user.getUsername())) {
             throw new NameAlreadyBoundException("Username " + user.getUsername() + " already taken");
         }
+        Statistic statistic = new Statistic(user.getUsername(), LocalDateTime.now(), 0L, 0L);
+        statisticRepository.save(statistic);
         user.setPassword(encoder.encode(user.getPassword()));
-        return repository.save(user);
+        return userRepository.save(user);
     }
 
     /**
@@ -53,7 +60,7 @@ public class UserService implements UserDetailsService {
      * </ul>
      */
     public boolean isUserExist(String username) {
-        if(repository.findByUsername(username).isPresent()) {
+        if(userRepository.findByUsername(username).isPresent()) {
             return false;
         }
         return true;
@@ -61,7 +68,7 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = repository.findByUsername(username);
+        Optional<User> user = userRepository.findByUsername(username);
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("Username not found: " + username);
         }
