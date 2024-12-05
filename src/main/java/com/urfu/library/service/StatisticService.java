@@ -32,13 +32,24 @@ public class StatisticService {
     }
 
     /**
+     * Получение статистики по почте пользователя
+     */
+    public Optional<Statistic> getStatisticByEmail(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) {
+            return Optional.empty();
+        }
+        return statisticRepository.findByUsername(user.get().getUsername());
+    }
+
+    /**
      * Обновляет статистику пользователя в зависимости от статуса нарушения дедлайна
      */
     public void updateStatistic(Reservation reservation) {
         User user = userRepository.findById(reservation.getUserId()).get();
         Statistic statistic = statisticRepository.findByUsername(user.getUsername()).get();
-        if(reservation.isDeadlineMissed()) {
-           statistic.setLateReturned(statistic.getLateReturned() + 1);
+        if (reservation.isDeadlineMissed()) {
+            statistic.setLateReturned(statistic.getLateReturned() + 1);
         } else {
             statistic.setInTimeReturned(statistic.getInTimeReturned() + 1);
         }

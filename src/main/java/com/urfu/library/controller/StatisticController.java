@@ -33,18 +33,19 @@ public class StatisticController {
      * Обработка запросов на получение статистики (своей или по имени пользователя)
      */
     @GetMapping
-    public ResponseEntity<StatisticDto> getStatistic(Authentication authentication, String username) {
+    public ResponseEntity<StatisticDto> getStatistic(Authentication authentication, String username, String email) {
         Optional<Statistic> statisticOptional;
-        if(username != null && authentication.getAuthorities().contains(Role.ROLE_ADMIN)) {
+        if (username != null && authentication.getAuthorities().contains(Role.ROLE_ADMIN)) {
             statisticOptional = statisticService.getStatisticByUsername(username);
-        }
-        else if (username != null && !authentication.getAuthorities().contains(Role.ROLE_ADMIN)) {
+        } else if (email != null && authentication.getAuthorities().contains(Role.ROLE_ADMIN)) {
+            statisticOptional = statisticService.getStatisticByEmail(email);
+        } else if((username != null || email != null) && !authentication.getAuthorities().contains(Role.ROLE_ADMIN)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        else {
+        } else {
             statisticOptional = statisticService.getStatisticByUsername(authentication.getName());
         }
-        if(statisticOptional.isEmpty()) {
+
+        if (statisticOptional.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         Statistic statistic = statisticOptional.get();
