@@ -6,10 +6,11 @@ import com.urfu.library.model.User;
 import com.urfu.library.service.ReservationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -22,6 +23,7 @@ import java.util.Optional;
 /**
  * Класс реализует модульные тесты для контроллера бронирований
  */
+@ExtendWith(MockitoExtension.class)
 class ReservationControllerTest {
 
     @Mock
@@ -31,7 +33,7 @@ class ReservationControllerTest {
     private ReservationController reservationController;
 
     private MockMvc mockMvc;
-    private User user;
+    private final User user = new User("kirill", "ugabuga@yandex.ru", "12345678", Role.ROLE_USER);
     private Long bookId;
     private List<Reservation> emptyReservations;
     private List<Reservation> reservations;
@@ -47,18 +49,15 @@ class ReservationControllerTest {
      */
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(reservationController).build();
 
-        emptyReservations = new ArrayList<>();
+        emptyReservations = List.of();
 
         reservations = new ArrayList<>();
         reservation = new Reservation();
         reservations.add(reservation);
 
         bookId = 1L;
-
-        user = new User("kirill", "ugabuga@yandex.ru", "12345678", Role.ROLE_USER);
     }
 
     /**

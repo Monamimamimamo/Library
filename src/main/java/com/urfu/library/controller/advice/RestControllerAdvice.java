@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.naming.NameAlreadyBoundException;
 import java.util.NoSuchElementException;
 
 /**
@@ -18,11 +19,8 @@ import java.util.NoSuchElementException;
  * @author Alexandr Filatov
  */
 @ControllerAdvice(annotations = RestController.class)
-public class BookControllerAdvice extends ResponseEntityExceptionHandler {
-    /**
-     * Отдает статус 422 Unprocessable Entity в случае невалидных аргументов метода
-     * @author Alexandr Filatov
-     */
+public class RestControllerAdvice extends ResponseEntityExceptionHandler {
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception,
                                                                   HttpHeaders headers,
@@ -37,5 +35,13 @@ public class BookControllerAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<Object> handleNoSuchElementException(NoSuchElementException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Обработчик исключений NameAlreadyBoundException
+     */
+    @ExceptionHandler(NameAlreadyBoundException.class)
+    public ResponseEntity<Object> handleNameAlreadyBoundException(NameAlreadyBoundException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 }

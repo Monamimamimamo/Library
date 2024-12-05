@@ -4,6 +4,8 @@ import com.urfu.library.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * Репозиторий сущности User для взаимодействия с базой данных
  */
@@ -12,5 +14,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /**
      * Поиск пользователя по логину
      */
-    User findByUsername(String username);
+    Optional<User> findByUsername(String username);
 }

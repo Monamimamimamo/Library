@@ -23,7 +23,7 @@ public class Book {
     @NotBlank(message = "Description must be not null")
     private String description;
 
-    private boolean isReserved;
+    private boolean isReserved = false;
 
     /**
      * Конструктор с указанием значений для всех полей, кроме ID - генерируется автоматически

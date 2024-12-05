@@ -43,20 +43,7 @@ public class User implements UserDetails {
      * Конструктор с явным указанием всех параметров, кроме ID - генерируется автоматически
      */
     public User(String username,String email, String password, Role role) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
-
-    /**
-     * Конструктор с указанием логина и пароля (по умолчанию создается пользователь с ролью USER)
-     */
-    public User(String username, String email, String password) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.role = Role.ROLE_USER;
+        this(null, username, email, password, role);
     }
 
     public User() {
@@ -112,13 +99,17 @@ public class User implements UserDetails {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof User user)) return false;
-        return Objects.equals(username, user.username);
+        if (this == o){
+            return true;
+        }
+        if (!(o instanceof User user)) {
+            return false;
+        }
+        return Objects.equals(id, user.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(username);
+        return Objects.hashCode(id);
     }
 }

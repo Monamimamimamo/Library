@@ -1,6 +1,7 @@
 package com.urfu.library.configuration;
 
-import com.urfu.library.controller.dto.UserRequestDto;
+import com.urfu.library.model.Role;
+import com.urfu.library.model.User;
 import com.urfu.library.model.Book;
 import com.urfu.library.model.repository.BookRepository;
 import com.urfu.library.model.repository.UserRepository;
@@ -13,6 +14,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -23,7 +28,8 @@ import org.springframework.web.context.WebApplicationContext;
  * Интеграционные тесты цепочки фильтров
  */
 @SpringBootTest
-public class SecurityConfigurationTests {
+@TestPropertySource(locations = "classpath:application.properties")
+public class SecurityFilterChainTests {
 
     @Autowired
     private WebApplicationContext context;
@@ -48,7 +54,7 @@ public class SecurityConfigurationTests {
     public void setup() {
         userRepository.deleteAll();
         bookRepository.deleteAll();
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(SecurityMockMvcConfigurers.springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(SecurityMockMvcConfigurers.springSecurity()).build();
     }
 
     /**
@@ -203,7 +209,7 @@ public class SecurityConfigurationTests {
      */
     @Test
     public void signIn_Success() throws Exception {
-        UserRequestDto user = new UserRequestDto("alex", "123@gmail.com", "qwerty");
+        User user = new User("alex", "123@gmail.com", "qwerty", Role.ROLE_USER);
         userService.createUser(user);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/signIn?username=alex&password=qwerty"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -214,9 +220,9 @@ public class SecurityConfigurationTests {
      */
     @Test
     public void signIn_Failure() throws Exception {
-        UserRequestDto user = new UserRequestDto("alex", "123@gmail.com", "12345");
+        User user = new User("alex", "123@gmail.com", "qwerty", Role.ROLE_USER);
         userService.createUser(user);
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/signIn?username=alex&password=qwerty"))
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/signIn?username=Alex&password=qwerty"))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
 }
