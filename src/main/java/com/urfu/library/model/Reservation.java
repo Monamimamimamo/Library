@@ -33,6 +33,11 @@ public class Reservation {
      * Конструктор с указанием значений для всех полей, кроме ID - генерируется автоматически
      */
     public Reservation(Long bookId, Long userId, boolean isReturned, boolean isDeadlineMissed, LocalDateTime startDate, LocalDateTime finishDate) {
+        this(null, bookId, userId, isReturned, isDeadlineMissed, startDate, finishDate);
+    }
+
+    public Reservation(Long id, Long bookId, Long userId, boolean isReturned, boolean isDeadlineMissed, LocalDateTime startDate, LocalDateTime finishDate) {
+        this.id = id;
         this.bookId = bookId;
         this.userId = userId;
         this.isReturned = isReturned;

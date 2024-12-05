@@ -11,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
@@ -192,7 +191,8 @@ public class ReservationServiceTest {
 
         Assertions.assertFalse(reservation.isDeadlineMissed());
 
-        Mockito.when(reservationRepository.findByIsReturned(false)).thenReturn(List.of(reservation));
+        Mockito.when(reservationRepository.findByIsReturned(false))
+                .thenReturn(List.of(reservation));
         reservation.setFinishDate(LocalDateTime.now().minusDays(1));
 
         Mockito.when(reservationRepository.findByIsReturned(false))
