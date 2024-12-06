@@ -1,7 +1,9 @@
 package com.urfu.library.service;
 
 import com.urfu.library.model.Role;
+import com.urfu.library.model.Statistic;
 import com.urfu.library.model.User;
+import com.urfu.library.model.repository.StatisticRepository;
 import com.urfu.library.model.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.naming.NameAlreadyBoundException;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -30,11 +33,16 @@ public class UserServiceTests {
     private UserRepository userRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private StatisticRepository statisticRepository;
 
     @InjectMocks
     private UserService userService;
 
     private User user;
+
+    private Statistic statistic = new Statistic(1L, "alex",
+            LocalDateTime.now(), 2L, 2L);
 
     /**
      * Настройка перед каждым тестом, создание тестовых пользователей с закодированными паролями
@@ -69,8 +77,9 @@ public class UserServiceTests {
     @Test
     public void testCreateUser_Failure() {
         Mockito.when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
+
         Exception exception = Assertions.assertThrows(NameAlreadyBoundException.class, () -> userService.createUser(user));
-        Assertions.assertEquals("Username Vanya already taken", exception.getMessage());
+        Assertions.assertEquals("Username or email already taken", exception.getMessage());
     }
 
     /**
