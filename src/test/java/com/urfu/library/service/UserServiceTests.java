@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -53,6 +54,7 @@ public class UserServiceTests {
     public void testCreateUser_Success() throws NameAlreadyBoundException {
         Mockito.when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.empty());
         Mockito.when(userRepository.save(user)).thenReturn(user);
+        Mockito.when(userRepository.findByEmail(ArgumentMatchers.anyString())).thenReturn(Optional.empty());
 
         Assertions.assertEquals(user, userService.createUser(user));
 
@@ -103,10 +105,10 @@ public class UserServiceTests {
     public void testIsUserExist() {
         Mockito.when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.empty());
 
-        Assertions.assertTrue(userService.isUserExist(user.getUsername()));
+        Assertions.assertTrue(userService.isUserExist(user.getUsername(), "test"));
 
         Mockito.when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
 
-        Assertions.assertFalse(userService.isUserExist(user.getUsername()));
+        Assertions.assertFalse(userService.isUserExist(user.getUsername(), "test"));
     }
 }

@@ -41,8 +41,8 @@ public class UserService implements UserDetailsService {
      * @throws NameAlreadyBoundException если имя пользователя уже занято
      */
     public User createUser(User user) throws NameAlreadyBoundException {
-        if (!isUserExist(user.getUsername())) {
-            throw new NameAlreadyBoundException("Username " + user.getUsername() + " already taken");
+        if (!isUserExist(user.getUsername(), user.getEmail())) {
+            throw new NameAlreadyBoundException("Username or email already taken");
         }
         Statistic statistic = new Statistic(user.getUsername(), LocalDateTime.now(), 0L, 0L);
         statisticRepository.save(statistic);
@@ -59,8 +59,11 @@ public class UserService implements UserDetailsService {
      *     <li>false - имя пользователя занято</li>
      * </ul>
      */
-    public boolean isUserExist(String username) {
+    public boolean isUserExist(String username, String email) {
         if(userRepository.findByUsername(username).isPresent()) {
+            return false;
+        }
+        if(userRepository.findByEmail(email).isPresent()) {
             return false;
         }
         return true;
