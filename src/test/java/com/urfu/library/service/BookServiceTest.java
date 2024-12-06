@@ -1,17 +1,20 @@
 package com.urfu.library.service;
 
 import com.urfu.library.model.Book;
-import com.urfu.library.model.BookRepository;
+import com.urfu.library.model.repository.BookRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
 
 /**
  * Класс реализует модульные тесты для сервиса книг
  */
+@ExtendWith(MockitoExtension.class)
 public class BookServiceTest {
 
     @Mock
@@ -23,11 +26,14 @@ public class BookServiceTest {
     private Book book;
     private Long bookId;
 
+    /**
+     * Метод инициализации для каждого теста.
+     * Создаёт тестовый экземпляр книги.
+     */
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
         bookId = 1L;
-        book = new Book("Test Title", "Test Author", "Test Description");
+        book = new Book("Test Title", "Test Author", "Test Description", false);
     }
 
     /**
@@ -68,7 +74,7 @@ public class BookServiceTest {
      */
     @Test
     public void testUpdateBookInfo_Success() {
-        Book newBookData = new Book("Updated Title", "Updated Author", "Updated Description");
+        Book newBookData = new Book("Updated Title", "Updated Author", "Updated Description", false);
 
         Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         Optional<Book> updatedBook = bookService.updateBookInfo(bookId, newBookData);
@@ -88,7 +94,9 @@ public class BookServiceTest {
     public void testUpdateBookInfo_BookNotFound() {
         Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> bookService.updateBookInfo(bookId, book), "Book to update not found");
+        NoSuchElementException exception = Assertions.assertThrows(NoSuchElementException.class,
+                () -> bookService.updateBookInfo(bookId, book));
+        Assertions.assertEquals("Book to update not found", exception.getMessage());
         Mockito.verify(bookRepository, Mockito.never()).save(ArgumentMatchers.any(Book.class));
     }
 
@@ -115,7 +123,9 @@ public class BookServiceTest {
     public void testDeleteBook_BookNotFound() {
         Mockito.when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> bookService.deleteBook(bookId), "Book to delete not found");
+        NoSuchElementException exception = Assertions.assertThrows(NoSuchElementException.class,
+                () -> bookService.deleteBook(bookId));
+        Assertions.assertEquals("Book to delete not found", exception.getMessage());
         Mockito.verify(bookRepository, Mockito.never()).deleteById(ArgumentMatchers.any(Long.class));
     }
 
