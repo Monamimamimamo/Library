@@ -106,12 +106,13 @@ class MailerServiceTest {
         Mockito.when(userRepository.findById(reservation.getUserId())).thenReturn(Optional.of(user));
 
         String expectedSubject = MessageTypes.NOTIFY.getSubject();
-        String expectedMessage = MessageTypes.NOTIFY.formatMessage(
+
+        String expectedMessage5 = MessageTypes.NOTIFY.formatMessage(
+                "5 дней",
                 reservation.getBookId(),
                 reservation.getStartDate(),
                 reservation.getFinishDate(),
-                user.getUsername(),
-                "5 дней"
+                user.getUsername()
         );
 
         mailerService.notifyDeadline(reservation, 5);
@@ -124,8 +125,39 @@ class MailerServiceTest {
         Assertions.assertNotNull(sentMessage);
         Assertions.assertEquals(user.getEmail(), sentMessage.getTo()[0]);
         Assertions.assertEquals(expectedSubject, sentMessage.getSubject());
-        Assertions.assertEquals(expectedMessage, sentMessage.getText());
+        Assertions.assertEquals(expectedMessage5, sentMessage.getText());
+
+        String expectedMessage3 = MessageTypes.NOTIFY.formatMessage(
+                "3 дня",
+                reservation.getBookId(),
+                reservation.getStartDate(),
+                reservation.getFinishDate(),
+                user.getUsername()
+        );
+
+        mailerService.notifyDeadline(reservation, 3);
+
+        captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+        Mockito.verify(mailSender, Mockito.times(2)).send(captor.capture()); // Второй вызов
+        sentMessage = captor.getValue();
+        Assertions.assertEquals(expectedMessage3, sentMessage.getText());
+
+        String expectedMessage1 = MessageTypes.NOTIFY.formatMessage(
+                "1 день",
+                reservation.getBookId(),
+                reservation.getStartDate(),
+                reservation.getFinishDate(),
+                user.getUsername()
+        );
+
+        mailerService.notifyDeadline(reservation, 1);
+
+        captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+        Mockito.verify(mailSender, Mockito.times(3)).send(captor.capture()); // Третий вызов
+        sentMessage = captor.getValue();
+        Assertions.assertEquals(expectedMessage1, sentMessage.getText());
     }
+
 
     /**
      * Тестирует отправку сообщения о возвращении книги.
