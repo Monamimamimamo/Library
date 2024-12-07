@@ -64,11 +64,11 @@ public class MailerService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             send(MessageTypes.NOTIFY, user,
+                    getDayMessage(daysLeft),
                     reservation.getBookId(),
                     reservation.getStartDate(),
                     reservation.getFinishDate(),
-                    user.getUsername(),
-                    getDayMessage(daysLeft)
+                    user.getUsername()
             );
         }
     }
