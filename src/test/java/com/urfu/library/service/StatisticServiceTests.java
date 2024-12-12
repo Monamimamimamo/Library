@@ -30,38 +30,14 @@ public class StatisticServiceTests {
     @InjectMocks
     private StatisticService statisticService;
 
-    private User user = new User("alex", "123@gmail.com","qwerty", Role.ROLE_USER);
-    private Statistic statistic = new Statistic(1L, "alex",
+    private final User user = new User("alex", "123@gmail.com",
+            "qwerty", Role.ROLE_USER);
+
+    private final Statistic statistic = new Statistic(1L, "alex",
             LocalDateTime.now(), 2L, 2L);
-    private Reservation reservation = new Reservation(1L, 1L, true, true,
-            LocalDateTime.now().minusHours(1), LocalDateTime.now());
 
-
-    /**
-     * Тест на получение статистики по пользователю, которого нет в системе
-     */
-    @Test
-    public void getStatisticByUsernameTest_NotFound() {
-        Mockito.when(statisticRepository.findByUsername(user.getUsername())).thenReturn(Optional.empty());
-        Optional<Statistic> statisticByUsername = statisticService.getStatisticByUsername(user.getUsername());
-        Assertions.assertTrue(statisticByUsername.isEmpty());
-
-        Mockito.verify(statisticRepository, Mockito.times(1)).findByUsername(user.getUsername());
-    }
-
-    /**
-     * Тест на получение статистики по пользователю
-     */
-    @Test
-    public void getStatisticByUsernameTest_Success() {
-        Mockito.when(statisticRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(statistic));
-        Optional<Statistic> statisticByUsername = statisticService.getStatisticByUsername(user.getUsername());
-        Assertions.assertTrue(statisticByUsername.isPresent());
-        Assertions.assertEquals(statistic, statisticByUsername.get());
-
-        Mockito.verify(statisticRepository, Mockito.times(1))
-                .findByUsername(user.getUsername());
-    }
+    private final Reservation reservation = new Reservation(1L, 1L, true,
+            true, LocalDateTime.now().minusHours(1), LocalDateTime.now());
 
     /**
      * Тест на обновление статистики пользователя при нарушении дедлайна возврата книги
@@ -74,8 +50,10 @@ public class StatisticServiceTests {
                 .thenReturn(Optional.of(statistic));
 
         statisticService.updateStatistic(reservation);
-        Mockito.verify(statisticRepository, Mockito.times(1)).save(ArgumentMatchers
-                .argThat(statistic -> statistic.getLateReturned() == 3L && statistic.getInTimeReturned() == 2L));
+
+        Mockito.verify(statisticRepository, Mockito.times(1))
+                .save(ArgumentMatchers.argThat(statistic -> statistic.getLateReturned() == 3L
+                        && statistic.getInTimeReturned() == 2L));
     }
 
     /**
@@ -89,7 +67,34 @@ public class StatisticServiceTests {
 
         reservation.setDeadlineMissed(false);
         statisticService.updateStatistic(reservation);
-        Mockito.verify(statisticRepository, Mockito.times(1)).save(ArgumentMatchers
-                .argThat(statistic -> statistic.getInTimeReturned() == 3L && statistic.getLateReturned() == 2L));
+
+        Mockito.verify(statisticRepository, Mockito.times(1))
+                .save(ArgumentMatchers.argThat(statistic -> statistic.getInTimeReturned() == 3L
+                        && statistic.getLateReturned() == 2L));
+    }
+
+    /**
+     * Тест на получение статистики по почте пользователя, которого нет в системе
+     */
+    @Test
+    public void getStatisticByEmailTest_UserNotFound() {
+        Mockito.when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
+        Optional<Statistic> statisticByEmail = statisticService.getStatisticByEmail(user.getEmail());
+        Assertions.assertTrue(statisticByEmail.isEmpty());
+
+        Mockito.verify(statisticRepository, Mockito.never()).findByUsername(ArgumentMatchers.any());
+    }
+
+    /**
+     * Тест на получение статистики по почте пользователя
+     */
+    @Test
+    public void getStatisticByEmailTest_Success() {
+        Mockito.when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        Optional<Statistic> statisticByEmail = statisticService.getStatisticByEmail(user.getEmail());
+
+        Assertions.assertTrue(statisticByEmail.isEmpty());
+        Mockito.verify(statisticRepository, Mockito.times(1))
+                .findByUsername(user.getUsername());
     }
 }
