@@ -44,6 +44,7 @@ public class StatisticService {
 
     /**
      * Обновляет статистику пользователя в зависимости от статуса нарушения дедлайна
+     * в переданной резервации
      */
     public void updateStatistic(Reservation reservation) {
         User user = userRepository.findById(reservation.getUserId()).get();

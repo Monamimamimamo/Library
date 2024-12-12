@@ -30,6 +30,9 @@ public class ReservationServiceTest {
     private MailerService mailerService;
 
     @Mock
+    private StatisticService statisticService;
+
+    @Mock
     private BookRepository bookRepository;
 
     @InjectMocks
