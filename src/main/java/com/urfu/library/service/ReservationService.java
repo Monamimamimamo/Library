@@ -53,9 +53,11 @@ public class ReservationService {
                 continue;
             }
 
-            boolean needToNotify = reservation.getFinishDate().isBefore(now.plusDays(5));
+            boolean needToNotify = reservation.getFinishDate()
+                    .isBefore(now.plusDays(5));
             if (needToNotify) {
-                long daysLeft = ChronoUnit.DAYS.between(now.toLocalDate(), reservation.getFinishDate());
+                long daysLeft = ChronoUnit.DAYS
+                        .between(now.toLocalDate(), reservation.getFinishDate());
                 mailerService.notifyDeadline(reservation, daysLeft);
             }
         }
