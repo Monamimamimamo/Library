@@ -63,7 +63,6 @@ public class ReservationService {
         }
     }
 
-
     /**
      * Создание бронирования на книгу.
      * Возвращает Optional.empty() в случае отсутствия книги и в случае,
@@ -77,7 +76,8 @@ public class ReservationService {
         }
         Book book = existingBook.get();
 
-        Reservation reservation = new Reservation(book.getId(), userId, false, false, LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
+        Reservation reservation = new Reservation(book.getId(), userId, false,
+                false, LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
         reservation = reservationRepository.save(reservation);
 
         book.setReserved(true);
@@ -95,20 +95,20 @@ public class ReservationService {
      * Отправляется сообщение пользователю и администраторам.
      */
     public boolean returnBook(Long bookId) {
-        Optional<Reservation> optionalReservation = reservationRepository.findByIsReturnedAndBookId(false, bookId);
+        Optional<Reservation> optionalReservation = reservationRepository
+                .findByIsReturnedAndBookId(false, bookId);
         if (optionalReservation.isPresent()) {
             Reservation reservation = optionalReservation.get();
-            if (!reservation.isReturned()) {
-                statisticService.updateStatistic(reservation);
-                reservation.setReturned(true);
-                reservationRepository.save(reservation);
 
-                Book book = bookRepository.findById(reservation.getBookId()).get();
-                book.setReserved(false);
-                bookRepository.save(book);
-                mailerService.notifyReturned(reservation);
-                return true;
-            }
+            statisticService.updateStatistic(reservation);
+            reservation.setReturned(true);
+            reservationRepository.save(reservation);
+
+            Book book = bookRepository.findById(reservation.getBookId()).get();
+            book.setReserved(false);
+            bookRepository.save(book);
+            mailerService.notifyReturned(reservation);
+            return true;
         }
         return false;
     }

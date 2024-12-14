@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +23,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/statistics")
 public class StatisticController {
-    private StatisticService statisticService;
+
+    private final StatisticService statisticService;
 
     @Autowired
     public StatisticController(StatisticService statisticService) {
@@ -30,16 +32,21 @@ public class StatisticController {
     }
 
     /**
-     * Обработка запросов на получение статистики (своей или по имени пользователя)
+     * Обработка запросов на получение статистики (своей или по имени/почте пользователя)
      */
     @GetMapping
-    public ResponseEntity<StatisticDto> getStatistic(Authentication authentication, String username, String email) {
+    public ResponseEntity<StatisticDto> getStatistic(String username, String email) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Optional<Statistic> statisticOptional;
-        if (username != null && authentication.getAuthorities().contains(Role.ROLE_ADMIN)) {
-            statisticOptional = statisticService.getStatisticByUsername(username);
-        } else if (email != null && authentication.getAuthorities().contains(Role.ROLE_ADMIN)) {
-            statisticOptional = statisticService.getStatisticByEmail(email);
-        } else if((username != null || email != null) && !authentication.getAuthorities().contains(Role.ROLE_ADMIN)) {
+        if (authentication.getAuthorities().contains(Role.ROLE_ADMIN)) {
+            if (username != null) {
+                statisticOptional = statisticService.getStatisticByUsername(username);
+            } else if (email != null) {
+                statisticOptional = statisticService.getStatisticByEmail(email);
+            } else {
+                statisticOptional = statisticService.getStatisticByUsername(authentication.getName());
+            }
+        } else if (username != null || email != null) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else {
             statisticOptional = statisticService.getStatisticByUsername(authentication.getName());

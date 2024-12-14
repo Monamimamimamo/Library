@@ -63,10 +63,7 @@ public class UserService implements UserDetailsService {
         if(userRepository.findByUsername(username).isPresent()) {
             return false;
         }
-        if(userRepository.findByEmail(email).isPresent()) {
-            return false;
-        }
-        return true;
+        return userRepository.findByEmail(email).isEmpty();
     }
 
     @Override
