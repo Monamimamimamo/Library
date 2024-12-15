@@ -75,7 +75,7 @@ public class MailerService {
 
 
     /**
-     * Отправляет уведомление об успешном возврате книги пользователю и администраторам.
+     * Отправляет уведомление об успешном возврате книги администраторам.
      */
     public void notifyReturned(Reservation reservation) {
         Optional<User> optionalUser = userRepository.findById(reservation.getUserId());
@@ -101,7 +101,8 @@ public class MailerService {
     private String getDayMessage(long daysLeft) {
         if (daysLeft % 10 == 1 && daysLeft % 100 != 11) {
             return daysLeft + " день";
-        } else if ((daysLeft % 10 >= 2 && daysLeft % 10 <= 4) && (daysLeft % 100 < 10 || daysLeft % 100 >= 20)) {
+        } else if ((daysLeft % 10 >= 2 && daysLeft % 10 <= 4)
+                && (daysLeft % 100 < 10 || daysLeft % 100 >= 20)) {
             return daysLeft + " дня";
         } else {
             return daysLeft + " дней";

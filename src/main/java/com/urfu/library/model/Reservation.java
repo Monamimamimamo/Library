@@ -36,6 +36,9 @@ public class Reservation {
         this(null, bookId, userId, isReturned, isDeadlineMissed, startDate, finishDate);
     }
 
+    /**
+     * Конструктор с явным указанием всех параметров
+     */
     public Reservation(Long id, Long bookId, Long userId, boolean isReturned, boolean isDeadlineMissed, LocalDateTime startDate, LocalDateTime finishDate) {
         this.id = id;
         this.bookId = bookId;

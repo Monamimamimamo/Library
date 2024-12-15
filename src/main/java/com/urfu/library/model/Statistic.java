@@ -29,6 +29,9 @@ public class Statistic {
     @Column
     private Long inTimeReturned;
 
+    /**
+     * Конструктор с явным указанием всех параметров
+     */
     public Statistic(Long id, String username, LocalDateTime registrationDate, Long lateReturned, Long inTimeReturned) {
         this.id = id;
         this.username = username;
@@ -37,6 +40,9 @@ public class Statistic {
         this.inTimeReturned = inTimeReturned;
     }
 
+    /**
+     * Конструктор с явным указанием всех параметров, кроме ID - генерируется автоматически
+     */
     public Statistic(String username, LocalDateTime registrationDate, Long lateReturned, Long inTimeReturned) {
         this(null, username, registrationDate, lateReturned, inTimeReturned);
     }
