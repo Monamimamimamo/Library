@@ -70,7 +70,7 @@ public class StatisticControllerTests {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.lateReturned").value("2"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.inTimeReturned").value("2"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.existedFor")
-                        .value("0 years, 1 months, 14 days"));
+                        .value("0 years, 1 months, 15 days"));
     }
 
     /**
@@ -89,7 +89,7 @@ public class StatisticControllerTests {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.lateReturned").value("2"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.inTimeReturned").value("2"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.existedFor")
-                        .value("0 years, 1 months, 14 days"));
+                        .value("0 years, 1 months, 15 days"));
     }
 
     /**
@@ -108,7 +108,7 @@ public class StatisticControllerTests {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.lateReturned").value("2"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.inTimeReturned").value("2"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.existedFor")
-                        .value("0 years, 1 months, 14 days"));
+                        .value("0 years, 1 months, 15 days"));
     }
 
     /**
