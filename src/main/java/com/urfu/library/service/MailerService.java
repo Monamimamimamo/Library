@@ -20,7 +20,7 @@ public class MailerService {
     @Value("${mail.username}")
     private String username;
 
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
     private final UserRepository userRepository;
 
     public MailerService(JavaMailSender mailSender, UserRepository userRepository) {
@@ -35,23 +35,13 @@ public class MailerService {
         Optional<User> optionalUser = userRepository.findById(reservation.getUserId());
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            send(MessageTypes.DEADLINE_EXPIRED_USER, optionalUser.get(),
+            send(MessageTypes.DEADLINE_EXPIRED_USER, user,
                     reservation.getBookId(),
                     reservation.getStartDate(),
                     reservation.getFinishDate(),
                     user.getUsername());
 
-            for (User admin : userRepository.findAll()) {
-                if (admin.getRole() == Role.ROLE_ADMIN) {
-                    send(MessageTypes.DEADLINE_EXPIRED_ADMIN, admin,
-                            reservation.getBookId(),
-                            reservation.getStartDate(),
-                            reservation.getFinishDate(),
-                            user.getUsername(),
-                            user.getEmail()
-                    );
-                }
-            }
+            notifyAdmins(reservation, user, MessageTypes.DEADLINE_EXPIRED_ADMIN);
         }
     }
 
@@ -81,17 +71,7 @@ public class MailerService {
         Optional<User> optionalUser = userRepository.findById(reservation.getUserId());
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            for (User admin : userRepository.findAll()) {
-                if (admin.getRole() == Role.ROLE_ADMIN) {
-                    send(MessageTypes.RETURNED, admin,
-                            reservation.getBookId(),
-                            reservation.getStartDate(),
-                            reservation.getFinishDate(),
-                            user.getUsername(),
-                            user.getEmail()
-                    );
-                }
-            }
+            notifyAdmins(reservation, user, MessageTypes.RETURNED);
         }
     }
 
@@ -127,5 +107,20 @@ public class MailerService {
         simpleMailMessage.setSubject(subject);
         simpleMailMessage.setText(messageBody);
         mailSender.send(simpleMailMessage);
+    }
+
+    /**
+     * Отправляет всем админам сообщение характерного типа.
+     */
+    private void notifyAdmins(Reservation reservation, User user, MessageTypes type) {
+        for (User admin : userRepository.findAllByRole(Role.ROLE_ADMIN)) {
+            send(type, admin,
+                    reservation.getBookId(),
+                    reservation.getStartDate(),
+                    reservation.getFinishDate(),
+                    user.getUsername(),
+                    user.getEmail()
+            );
+        }
     }
 }
