@@ -223,4 +223,3 @@ public class SecurityFilterChainTests {
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
 }
-
