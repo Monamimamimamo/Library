@@ -34,7 +34,7 @@ public class StatisticControllerTests {
     private StatisticService statisticService;
 
     @Mock
-    SecurityContext securityContext;
+    private SecurityContext securityContext;
 
     @InjectMocks
     private StatisticController statisticController;
@@ -42,11 +42,14 @@ public class StatisticControllerTests {
     private final Statistic statistic = new Statistic(1L, "alex",
             LocalDateTime.now().minusDays(45), 2L, 2L);
 
-    Authentication authentication = new TestingAuthenticationToken(null,
+    private final Authentication authentication = new TestingAuthenticationToken(null,
             null, List.of(Role.ROLE_ADMIN));
 
     private MockMvc mockMvc;
 
+    /**
+     * Задает контекст и настраивает mockMvc перед каждым тестом
+     */
     @BeforeEach
     public void setUp() {
         SecurityContextHolder.setContext(securityContext);
