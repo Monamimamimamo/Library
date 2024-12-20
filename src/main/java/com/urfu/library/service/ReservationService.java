@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,18 +19,25 @@ import java.util.Optional;
 @Service
 public class ReservationService {
 
+    private final MailerService mailerService;
     private final ReservationRepository reservationRepository;
     private final BookRepository bookRepository;
+    private final StatisticService statisticService;
 
     @Autowired
-    public ReservationService(ReservationRepository reservationRepository, BookRepository bookRepository) {
+    public ReservationService(MailerService mailerService, ReservationRepository reservationRepository, BookRepository bookRepository, StatisticService statisticService) {
+        this.mailerService = mailerService;
         this.reservationRepository = reservationRepository;
         this.bookRepository = bookRepository;
+        this.statisticService = statisticService;
     }
 
     /**
-     * Каждый день в определённое время проверяет вышли ли невозвращённые книги за дедлайн.
-     * В случае пропуска дедлайна, статус дедлайна бронирования меняется на true.
+     * Срабатывает каждый день в определённое время.
+     * Проверяет вышли ли невозвращённые книги за дедлайн.
+     * В случае пропуска дедлайна, статус дедлайна бронирования меняется на true, и отправляется характерное сообщение пользователю и администраторам.
+     * Иначе проверяется необходимость отправки напоминания о предстоящнем дедлайне.
+     * Напоминание происходит, если до дедлайна осталось меньше 5 дней.
      */
     @Scheduled(cron = "${deadline.status.update.cron}")
     public void updateMissedDeadlines() {
@@ -41,6 +49,16 @@ public class ReservationService {
             if (reservation.getFinishDate().isBefore(now)) {
                 reservation.setDeadlineMissed(true);
                 reservationRepository.save(reservation);
+                mailerService.notifyDeadlineExpired(reservation);
+                continue;
+            }
+
+            boolean needToNotify = reservation.getFinishDate()
+                    .isBefore(now.plusDays(5));
+            if (needToNotify) {
+                long daysLeft = ChronoUnit.DAYS
+                        .between(now.toLocalDate(), reservation.getFinishDate());
+                mailerService.notifyDeadline(reservation, daysLeft);
             }
         }
     }
@@ -58,7 +76,8 @@ public class ReservationService {
         }
         Book book = existingBook.get();
 
-        Reservation reservation = new Reservation(book.getId(), userId, false, false, LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
+        Reservation reservation = new Reservation(book.getId(), userId, false,
+                false, LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
         reservation = reservationRepository.save(reservation);
 
         book.setReserved(true);
@@ -72,23 +91,24 @@ public class ReservationService {
      * Возвращает false, в случае отсутствия активного бронирования по данной книге, иначе true.
      * Бронирование считается неактивным после возврата книги.
      * Изменяет isReserved книги на false.
+     * Обновляет статистику пользователя.
+     * Отправляется сообщение пользователю и администраторам.
      */
     public boolean returnBook(Long bookId) {
-        Optional<Reservation> optionalReservation = reservationRepository.findByIsReturnedAndBookId(false, bookId);
+        Optional<Reservation> optionalReservation = reservationRepository
+                .findByIsReturnedAndBookId(false, bookId);
         if (optionalReservation.isPresent()) {
             Reservation reservation = optionalReservation.get();
-            if (!reservation.isReturned()) {
-                reservation.setReturned(true);
-                reservationRepository.save(reservation);
 
-                Optional<Book> optionalBook = bookRepository.findById(reservation.getBookId());
-                if (optionalBook.isPresent()) {
-                    Book book = optionalBook.get();
-                    book.setReserved(false);
-                    bookRepository.save(book);
-                    return true;
-                }
-            }
+            statisticService.updateStatistic(reservation);
+            reservation.setReturned(true);
+            reservationRepository.save(reservation);
+
+            Book book = bookRepository.findById(reservation.getBookId()).get();
+            book.setReserved(false);
+            bookRepository.save(book);
+            mailerService.notifyReturned(reservation);
+            return true;
         }
         return false;
     }
