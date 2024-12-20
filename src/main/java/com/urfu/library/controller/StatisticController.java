@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
@@ -35,7 +36,9 @@ public class StatisticController {
      * Обработка запросов на получение статистики (своей или по имени/почте пользователя)
      */
     @GetMapping
-    public ResponseEntity<StatisticDto> getStatistic(String username, String email) {
+    public ResponseEntity<StatisticDto> getStatistic(
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) String email) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Optional<Statistic> statisticOptional;
         if (authentication.getAuthorities().contains(Role.ROLE_ADMIN)) {
