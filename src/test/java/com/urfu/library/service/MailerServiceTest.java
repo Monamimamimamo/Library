@@ -55,7 +55,8 @@ class MailerServiceTest {
     @Test
     void testNotifyDeadlineExpired() {
         Mockito.when(userRepository.findById(reservation.getUserId())).thenReturn(Optional.of(user));
-        Mockito.when(userRepository.findAll()).thenReturn(Collections.singletonList(new User(2L, "admin", "admin@example.com", "adminpass", Role.ROLE_ADMIN)));
+        Mockito.when(userRepository.findAllByRole(Role.ROLE_ADMIN))
+                .thenReturn(Collections.singletonList(new User(2L, "admin", "admin@example.com", "adminpass", Role.ROLE_ADMIN)));
         String expectedSubject = MessageTypes.DEADLINE_EXPIRED_USER.getSubject();
         String expectedBodyForUser = MessageTypes.DEADLINE_EXPIRED_USER.formatMessage(
                 reservation.getBookId(),
@@ -166,7 +167,8 @@ class MailerServiceTest {
     @Test
     void testNotifyReturned() {
         Mockito.when(userRepository.findById(reservation.getUserId())).thenReturn(Optional.of(user));
-        Mockito.when(userRepository.findAll()).thenReturn(Collections.singletonList(new User(2L, "admin", "admin@example.com", "adminpass", Role.ROLE_ADMIN)));
+        Mockito.when(userRepository.findAllByRole(Role.ROLE_ADMIN))
+                .thenReturn(Collections.singletonList(new User(2L, "admin", "admin@example.com", "adminpass", Role.ROLE_ADMIN)));
 
         String expectedSubject = MessageTypes.RETURNED.getSubject();
         String expectedBody = MessageTypes.RETURNED.formatMessage(
